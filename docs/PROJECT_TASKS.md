@@ -103,13 +103,13 @@
 
 ---
 
-## Phase 4 — Polish / Production Hardening
+## Phase 4 - Polish / Production Hardening
 
 - [ ] Drag-and-drop lesson reorder
 - [ ] Course search and filtering
 - [ ] Email notifications
 - [ ] Certificate generation
-- [ ] Replace local slip storage with persistent object storage
+- [x] Add Vercel Blob support for slip upload with local fallback
 - [ ] Production deployment verification on Vercel
 
 ---
@@ -130,7 +130,7 @@
 - [ ] Set `DATABASE_URL`
 - [ ] Set `NEXTAUTH_SECRET`
 - [ ] Set `NEXTAUTH_URL`
-- [ ] Replace `/public/uploads/` slip storage
+- [ ] Set `BLOB_READ_WRITE_TOKEN`
 - [ ] Import GitHub repo into Vercel
 - [ ] Run post-deploy smoke tests
 
@@ -142,5 +142,5 @@
 2. Forgot/reset password
 3. Search + filter
 4. Lesson reorder UX
-5. Persistent production file storage
+5. Vercel project env + Blob store wiring
 6. Production deploy + monitoring

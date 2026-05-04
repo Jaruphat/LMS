@@ -86,6 +86,7 @@ cp .env.example .env.local
 - `SHADOW_DATABASE_URL`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `BLOB_READ_WRITE_TOKEN` ถ้าต้องการทดสอบ Vercel Blob จากเครื่อง local
 
 4. push schema และ seed ข้อมูล
 
@@ -122,20 +123,14 @@ npm run test:e2e
 
 ## Notes เรื่องข้อมูลอัปโหลด
 
-ตอนนี้ slip upload ใช้ local filesystem ที่ `public/uploads/` สำหรับ development
+ระบบรองรับ 2 โหมด:
 
-ถ้าจะ deploy production บน Vercel ควรเปลี่ยน storage ของ slip ไปเป็น:
+- ถ้ามี `BLOB_READ_WRITE_TOKEN` จะอัปโหลด slip ไปที่ Vercel Blob
+- ถ้ายังไม่มี token ระบบจะ fallback ไปเก็บใน `public/uploads/` สำหรับ local development และ e2e tests
 
-- Vercel Blob
-- Cloudflare R2
-- หรือ object storage อื่นที่ persistent
+ข้อจำกัดปัจจุบันของ server upload บน Vercel คือควรใช้ไฟล์ไม่เกิน `4.5MB` ดังนั้น validation ของ slip จะอิงขีดจำกัดนี้
 
 ## Push ขึ้น GitHub
-
-สถานะ git ปัจจุบัน:
-
-- current branch: `master`
-- remote: ยังไม่มี
 
 ตัวอย่างขั้นตอน:
 
@@ -165,14 +160,14 @@ git push -u origin main
 - `DATABASE_URL` สำหรับ production
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
-- production-ready file storage สำหรับ slip
+- `BLOB_READ_WRITE_TOKEN`
 
 ### Recommended Flow
 
 1. push repo นี้ขึ้น GitHub ให้เรียบร้อย
 2. import repo เข้า Vercel
 3. ตั้ง Environment Variables
-4. เปลี่ยน slip storage จาก local เป็น Vercel Blob หรือ R2
+4. สร้าง Blob store แล้วผูก `BLOB_READ_WRITE_TOKEN`
 5. deploy
 6. run smoke test หลัง deploy
 

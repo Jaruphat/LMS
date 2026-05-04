@@ -31,7 +31,7 @@ export async function POST(
   }
 
   try {
-    const slipUrl = await saveSlipFile(slip)
+    const slipUrl = await saveSlipFile(slip, { orderId })
     const updatedOrder = await db.order.update({
       where: { id: orderId },
       data: {

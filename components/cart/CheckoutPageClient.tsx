@@ -128,7 +128,7 @@ export function CheckoutPageClient() {
           <h2 className="mb-4 text-lg font-semibold text-slate-900">อัปโหลดสลิป</h2>
           <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center hover:border-indigo-300 hover:bg-indigo-50/30">
             <UploadCloud className="mb-3 h-9 w-9 text-slate-400" />
-            <span className="mb-1 text-sm font-medium text-slate-700">เลือกไฟล์ JPG, PNG หรือ PDF ไม่เกิน 5MB</span>
+            <span className="mb-1 text-sm font-medium text-slate-700">เลือกไฟล์ JPG, PNG หรือ PDF ไม่เกิน 4.5MB</span>
             <span className="text-xs text-slate-500">แนบสลิปครั้งเดียวพร้อมคำสั่งซื้อ</span>
             <input
               data-testid="slip-upload-input"

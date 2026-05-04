@@ -46,22 +46,22 @@ git push -u origin main
 - `DATABASE_URL`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `BLOB_READ_WRITE_TOKEN`
 
 ### Optional for local migration workflow
 
 - `SHADOW_DATABASE_URL`
 
-### Important production note
+### Slip storage note
 
-ตอนนี้ slip upload เขียนไฟล์ลง `public/uploads/` ผ่าน Node filesystem
+ตอนนี้โค้ดรองรับ Vercel Blob แล้ว
 
-แนวทางนี้ใช้ได้สำหรับ local MVP แต่ไม่ควรใช้เป็น production storage บน Vercel
+- ถ้ามี `BLOB_READ_WRITE_TOKEN` ระบบจะอัปโหลด slip ไปที่ Vercel Blob
+- ถ้ายังไม่มี token ระบบจะ fallback ไปเขียนที่ `public/uploads/` สำหรับ local development
 
-ก่อน deploy production ควรย้ายไปใช้หนึ่งในตัวเลือกต่อไปนี้:
+สำหรับ preview และ production บน Vercel ควรสร้าง Blob store และผูก token ให้ครบก่อน deploy
 
-- Vercel Blob
-- Cloudflare R2
-- S3-compatible object storage
+ข้อจำกัดของแนวทาง server upload นี้คือควรใช้ไฟล์ไม่เกิน `4.5MB`
 
 ---
 
