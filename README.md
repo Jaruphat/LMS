@@ -1,36 +1,179 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LearnHub LMS MVP
 
-## Getting Started
+ระบบ LMS แบบ MVP สำหรับคอร์สสาย Automation, OCR, AI Ops และ manual payment approval flow
 
-First, run the development server:
+## Status
+
+- MVP พร้อมใช้งานในเครื่องแล้ว
+- ผ่าน `npm run lint`
+- ผ่าน `npm run build`
+- ผ่าน `npm run test:e2e` จำนวน `7/7` เคส
+- วันที่อัปเดตสถานะล่าสุด: `2026-05-04`
+
+## Scope ที่มีจริงใน MVP
+
+### Public
+
+- `/` redirect ไป `/courses`
+- `/courses` storefront หลักพร้อม hero banner, course catalog, และภาพ mockup
+- `/courses/[courseId]` รายละเอียดคอร์ส
+- `/about`
+- `/contact`
+- `404 fallback`
+
+### Auth
+
+- สมัครสมาชิก
+- เข้าสู่ระบบด้วย NextAuth credentials
+- role guard สำหรับ `STUDENT` และ `ADMIN`
+
+### Student
+
+- cart ด้วย `localStorage`
+- checkout
+- upload slip
+- order history
+- purchased courses dashboard
+- lesson viewer
+- quiz submission
+- progress tracking
+
+### Admin
+
+- dashboard stats
+- course CRUD
+- lesson CRUD
+- order approve / reject
+- enrollment auto-create หลัง approve
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- React 19
+- Tailwind CSS v4
+- Prisma 7 + `@prisma/adapter-pg`
+- PostgreSQL
+- NextAuth v4
+- Playwright
+
+## App Location
+
+repo นี้คือ application source หลักอยู่ที่ root ของโฟลเดอร์ `lms/`
+
+เอกสารสำคัญ:
+
+- [PRD](./docs/PRD.md)
+- [Project Tasks](./docs/PROJECT_TASKS.md)
+- [Deployment Notes](./docs/DEPLOYMENT.md)
+
+## Local Setup
+
+1. ติดตั้ง dependency
+
+```bash
+npm install
+```
+
+2. สร้าง env จากตัวอย่าง
+
+```bash
+cp .env.example .env.local
+```
+
+3. ใส่ค่าที่ต้องใช้ใน `.env.local`
+
+- `DATABASE_URL`
+- `SHADOW_DATABASE_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+
+4. push schema และ seed ข้อมูล
+
+```bash
+npx prisma db push
+npx tsx prisma/seed.ts
+```
+
+5. รัน dev server
+
+```bash
+npm run dev -- --port 3000 --webpack
+```
+
+หรือใช้สคริปต์ที่เตรียมไว้จาก workspace root:
+
+```powershell
+..\start-lms-dev.cmd 3000
+```
+
+## Demo Accounts
+
+- `admin@lms.dev / admin1234`
+- `student@lms.dev / student1234`
+
+## Scripts
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run build
+npm run test:e2e
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Notes เรื่องข้อมูลอัปโหลด
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ตอนนี้ slip upload ใช้ local filesystem ที่ `public/uploads/` สำหรับ development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ถ้าจะ deploy production บน Vercel ควรเปลี่ยน storage ของ slip ไปเป็น:
 
-## Learn More
+- Vercel Blob
+- Cloudflare R2
+- หรือ object storage อื่นที่ persistent
 
-To learn more about Next.js, take a look at the following resources:
+## Push ขึ้น GitHub
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+สถานะ git ปัจจุบัน:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- current branch: `master`
+- remote: ยังไม่มี
 
-## Deploy on Vercel
+ตัวอย่างขั้นตอน:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cd C:\AI\LMS\lms
+git status
+git add .
+git commit -m "Prepare LearnHub LMS MVP for GitHub and Vercel"
+git branch -M main
+git remote add origin https://github.com/<your-user>/<your-repo>.git
+git push -u origin main
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+ถ้า GitHub repo ถูกสร้างไว้แล้วแต่มี remote เดิมผิด:
+
+```bash
+git remote remove origin
+git remote add origin https://github.com/<your-user>/<your-repo>.git
+git push -u origin main
+```
+
+## Prepare for Vercel
+
+### Required
+
+- production PostgreSQL database
+- `DATABASE_URL` สำหรับ production
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- production-ready file storage สำหรับ slip
+
+### Recommended Flow
+
+1. push repo นี้ขึ้น GitHub ให้เรียบร้อย
+2. import repo เข้า Vercel
+3. ตั้ง Environment Variables
+4. เปลี่ยน slip storage จาก local เป็น Vercel Blob หรือ R2
+5. deploy
+6. run smoke test หลัง deploy
+
+รายละเอียด checklist อยู่ที่ [Deployment Notes](./docs/DEPLOYMENT.md)
