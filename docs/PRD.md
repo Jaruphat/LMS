@@ -1,7 +1,7 @@
 # LearnHub LMS PRD
 
 > Updated: `2026-05-05`
-> Status: `MVP ready locally, production redeploy pending for latest media changes`
+> Status: `MVP ready, deployed, and smoke-tested on production`
 > App source of truth: `lms/`
 
 ## 1. Product Overview
@@ -26,6 +26,7 @@ MVP ปัจจุบันรองรับ flow สำคัญครบ:
 - `npm run lint`
 - `npm run build`
 - `npm run test:e2e` ผ่าน `10/10`
+- production smoke test ผ่าน `10/10`
 
 ### Covered by E2E
 
@@ -222,4 +223,4 @@ MVP ปัจจุบันรองรับ flow สำคัญครบ:
 4. Drag-and-drop lesson reorder
 5. Email notifications
 6. Certificate generation
-7. Production redeploy verification after latest media changes
+7. Search / analytics hardening for long-term operations

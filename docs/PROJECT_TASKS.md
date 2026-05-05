@@ -2,7 +2,7 @@
 
 > Updated: `2026-05-05`
 > Application repo: `lms/`
-> Status: `MVP ready and redeploy pending for latest media updates`
+> Status: `MVP ready, deployed, and smoke-tested on production`
 
 ## MVP Release Status
 
@@ -53,7 +53,7 @@
 - [x] Vercel Blob support for slip upload
 - [x] Real admin video upload with local fallback
 - [x] MP4 / WebM preview verified via Playwright
-- [ ] Redeploy production with latest media changes
+- [x] Redeploy production with latest media changes
 
 ## Deployment Checklist
 
@@ -61,9 +61,9 @@
 - [x] `.env.example` updated
 - [x] `.gitignore` covers local uploads and logs
 - [x] Repo docs mirrored inside `docs/`
-- [ ] Push latest commit to GitHub
-- [ ] Trigger new Vercel deployment
-- [ ] Smoke test production after redeploy
+- [x] Push latest commit to GitHub
+- [x] Trigger new Vercel deployment
+- [x] Smoke test production after redeploy
 
 ## Post-MVP Backlog
 
