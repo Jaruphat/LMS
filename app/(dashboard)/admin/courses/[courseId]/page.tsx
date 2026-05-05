@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ChevronLeft, Plus, PencilLine } from "lucide-react"
+import { ChevronLeft, PencilLine, Plus } from "lucide-react"
 import { DeleteButton } from "@/components/admin/DeleteButton"
 import { getAdminCourse } from "@/lib/data"
 
@@ -48,6 +48,8 @@ export default async function AdminCourseLessonsPage({
         <div className="flex flex-wrap gap-4 text-sm text-slate-500">
           <span>{course.lessons.length} บทเรียน</span>
           <span>{course._count.enrollments} ผู้เรียน</span>
+          <span>{course.viewCount} views</span>
+          <span>{course.ratingAverage.toFixed(1)} / 5 ({course.ratingCount} รีวิว)</span>
           <span>{course.status}</span>
         </div>
       </div>
@@ -68,7 +70,14 @@ export default async function AdminCourseLessonsPage({
                     <span className="rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-700">Preview</span>
                   )}
                 </div>
-                <p className="text-sm text-slate-500">{lesson._count.quizzes} quiz question(s)</p>
+
+                <p className="text-sm text-slate-500">
+                  {lesson._count.quizzes} quiz question(s)
+                  {lesson.durationText ? ` • ${lesson.durationText}` : ""}
+                  {lesson.viewCount > 0 ? ` • ${lesson.viewCount} views` : ""}
+                </p>
+
+                {lesson.summary ? <p className="mt-2 text-sm leading-7 text-slate-500">{lesson.summary}</p> : null}
               </div>
 
               <div className="flex flex-wrap gap-2">

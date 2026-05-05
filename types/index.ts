@@ -18,8 +18,11 @@ export interface Course {
   thumbnailUrl?: string | null
   price: number
   status: CourseStatus
+  viewCount: number
   createdBy: string
   createdAt: Date
+  ratingAverage?: number
+  ratingCount?: number
   lessons?: Lesson[]
   creator?: Pick<User, "id" | "email">
 }
@@ -30,8 +33,11 @@ export interface Lesson {
   title: string
   contentType: ContentType
   content: string
+  summary?: string | null
+  durationText?: string | null
   order: number
   isPreview: boolean
+  viewCount: number
   quizzes?: Quiz[]
 }
 
@@ -63,6 +69,50 @@ export interface Enrollment {
   orderId?: string | null
   enrolledAt: Date
   course?: Course
+}
+
+export interface CourseReview {
+  id: string
+  courseId: string
+  userId: string
+  rating: number
+  review?: string | null
+  createdAt: Date
+  updatedAt: Date
+  user?: Pick<User, "id" | "email" | "name">
+}
+
+export interface DiscussionThread {
+  id: string
+  courseId: string
+  lessonId?: string | null
+  userId: string
+  title: string
+  content: string
+  isPinned: boolean
+  createdAt: Date
+  updatedAt: Date
+  user?: Pick<User, "id" | "email" | "name">
+  replies?: DiscussionReply[]
+}
+
+export interface DiscussionReply {
+  id: string
+  threadId: string
+  userId: string
+  content: string
+  createdAt: Date
+  updatedAt: Date
+  user?: Pick<User, "id" | "email" | "name">
+}
+
+export interface CourseChatMessage {
+  id: string
+  courseId: string
+  userId?: string | null
+  prompt: string
+  response: string
+  createdAt: Date
 }
 
 export interface Quiz {

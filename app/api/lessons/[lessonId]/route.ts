@@ -8,6 +8,8 @@ const updateSchema = z.object({
   title: z.string().min(1).optional(),
   contentType: z.enum(["VIDEO", "TEXT"]).optional(),
   content: z.string().min(1).optional(),
+  summary: z.string().trim().max(2000).nullable().optional(),
+  durationText: z.string().trim().max(80).nullable().optional(),
   order: z.number().int().min(0).optional(),
   isPreview: z.boolean().optional(),
 })
@@ -69,7 +71,13 @@ export async function PATCH(
     const { lessonId } = await params
     const lesson = await db.lesson.update({
       where: { id: lessonId },
-      data: result.data,
+      data: {
+        ...result.data,
+        ...(result.data.summary !== undefined ? { summary: result.data.summary?.trim() || null } : {}),
+        ...(result.data.durationText !== undefined
+          ? { durationText: result.data.durationText?.trim() || null }
+          : {}),
+      },
     })
 
     return NextResponse.json(lesson)

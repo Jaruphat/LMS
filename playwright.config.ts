@@ -1,5 +1,11 @@
 import { defineConfig, devices } from "@playwright/test"
 
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000"
+const shouldStartLocalServer =
+  process.env.PLAYWRIGHT_SKIP_WEBSERVER !== "1" &&
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(baseURL)
+const vercelProtectionBypassToken = process.env.VERCEL_PROTECTION_BYPASS_TOKEN
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
@@ -10,7 +16,15 @@ export default defineConfig({
   ],
   outputDir: ".artifacts/playwright/test-results",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
+    ...(vercelProtectionBypassToken
+      ? {
+          extraHTTPHeaders: {
+            "x-vercel-protection-bypass": vercelProtectionBypassToken,
+            "x-vercel-set-bypass-cookie": "true",
+          },
+        }
+      : {}),
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -24,10 +38,14 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: "cmd /c ..\\start-lms-dev.cmd 3000",
-    url: "http://localhost:3000",
-    reuseExistingServer: true,
-    timeout: 240000,
-  },
+  ...(shouldStartLocalServer
+    ? {
+        webServer: {
+          command: "cmd /c ..\\start-lms-dev.cmd 3000",
+          url: baseURL,
+          reuseExistingServer: true,
+          timeout: 240000,
+        },
+      }
+    : {}),
 })

@@ -8,6 +8,8 @@ const createSchema = z.object({
   title: z.string().min(1),
   contentType: z.enum(["VIDEO", "TEXT"]),
   content: z.string().min(1),
+  summary: z.string().trim().max(2000).nullable().optional(),
+  durationText: z.string().trim().max(80).nullable().optional(),
   order: z.number().int().min(0),
   isPreview: z.boolean().default(false),
 })
@@ -30,7 +32,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "ไม่พบคอร์สที่ต้องการเพิ่มบทเรียน" }, { status: 404 })
     }
 
-    const lesson = await db.lesson.create({ data: result.data })
+    const lesson = await db.lesson.create({
+      data: {
+        ...result.data,
+        summary: result.data.summary?.trim() || null,
+        durationText: result.data.durationText?.trim() || null,
+      },
+    })
     return NextResponse.json(lesson, { status: 201 })
   } catch (cause) {
     console.error("Failed to create lesson", cause)

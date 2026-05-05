@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link"
-import { BookOpen, Users, Clock } from "lucide-react"
+import { BookOpen, Users, Clock, Eye } from "lucide-react"
 import { formatPrice } from "@/lib/format"
 
 const CATEGORY_COLORS = [
@@ -40,21 +40,24 @@ interface Props {
     description: string
     thumbnailUrl?: string | null
     price: number
+    viewCount: number
+    ratingAverage?: number
+    ratingCount?: number
     creator: { email: string }
-    _count: { lessons: number; enrollments: number }
+    _count: { lessons: number; enrollments: number; reviews: number }
   }
 }
 
 export function CourseCard({ course }: Props) {
   const catIdx = hashNum(course.id, CATEGORIES.length)
   const levelIdx = hashNum(course.id + "lv", LEVELS.length)
-  const rating = 4 + hashNum(course.id + "rt", 2)
-  const reviewCount = 10 + hashNum(course.id + "rv", 280)
   const hours = 2 + hashNum(course.id + "hr", 18)
 
   const category = CATEGORIES[catIdx]
   const level = LEVELS[levelIdx]
   const catColor = CATEGORY_COLORS[catIdx]
+  const ratingAverage = course.ratingAverage ?? 0
+  const reviewCount = course.ratingCount ?? course._count.reviews ?? 0
 
   return (
     <Link href={`/courses/${course.id}`} className="group block h-full">
@@ -102,9 +105,15 @@ export function CourseCard({ course }: Props) {
 
           {/* Rating */}
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm font-bold text-amber-500">{rating}.0</span>
-            <StarRating rating={rating} />
-            <span className="text-xs text-slate-400">({reviewCount})</span>
+            {reviewCount > 0 ? (
+              <>
+                <span className="text-sm font-bold text-amber-500">{ratingAverage.toFixed(1)}</span>
+                <StarRating rating={Math.round(ratingAverage)} />
+                <span className="text-xs text-slate-400">({reviewCount})</span>
+              </>
+            ) : (
+              <span className="text-xs font-semibold text-slate-400">ยังไม่มีรีวิว</span>
+            )}
           </div>
 
           {/* Spacer */}
@@ -120,6 +129,10 @@ export function CourseCard({ course }: Props) {
               <span className="flex items-center gap-1">
                 <Users className="w-3.5 h-3.5 text-amber-400" />
                 {course._count.enrollments}
+              </span>
+              <span className="flex items-center gap-1">
+                <Eye className="w-3.5 h-3.5 text-amber-400" />
+                {course.viewCount}
               </span>
             </div>
             <span className="text-xs font-semibold text-amber-600 group-hover:underline">

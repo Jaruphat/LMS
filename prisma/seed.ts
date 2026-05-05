@@ -14,6 +14,9 @@ const MOCKUP_THUMB = "/images/generated/course-showcase-mockup.png"
 type SeedLesson = {
   title: string
   content: string
+  contentType?: "TEXT" | "VIDEO"
+  summary?: string
+  durationText?: string
   isPreview?: boolean
 }
 
@@ -28,7 +31,108 @@ type SeedCourse = {
   lessons: SeedLesson[]
 }
 
+const TYPESCRIPT_FRAMEWORK_VIDEO_LESSONS: SeedLesson[] = [
+  {
+    title: "Day 1: Introduction to TypeScript และการเตรียมเครื่องมือ",
+    content: "https://www.youtube.com/watch?v=zQnBQ4tB3ZA",
+    contentType: "VIDEO",
+    summary:
+      "เริ่มจากภาพรวมของ TypeScript, การติดตั้งเครื่องมือ และเหตุผลที่ภาษาแบบมี type system ช่วยให้โปรเจกต์ขยายต่อได้ง่ายขึ้น",
+    durationText: "03:07:32",
+    isPreview: true,
+  },
+  {
+    title: "Day 2: Basic Syntax, Functions และการใช้ type ให้ถูกจุด",
+    content: "https://www.youtube.com/watch?v=34xpwykL4Uc",
+    contentType: "VIDEO",
+    summary:
+      "โฟกัสเรื่อง primitive types, function signatures, optional parameters และรูปแบบการเขียนฟังก์ชันที่ใช้ต่อใน framework ได้จริง",
+    durationText: "04:19:50",
+    isPreview: true,
+  },
+  {
+    title: "Day 3: Classes, Modules และการจัดโครงสร้างโปรเจกต์",
+    content: "https://www.youtube.com/watch?v=zQondDhCXDI",
+    contentType: "VIDEO",
+    summary:
+      "วางรากฐานเรื่อง class, interface, inheritance และการแยกโมดูลเพื่อเตรียมพร้อมก่อนเชื่อมกับ framework หลายตัว",
+    durationText: "03:43:45",
+  },
+  {
+    title: "Day 4: พื้นฐาน Next.js กับ TypeScript",
+    content: "https://www.youtube.com/watch?v=Sklc_fQBmcs",
+    contentType: "VIDEO",
+    summary:
+      "เข้าใจ routing, server rendering และวิธีใช้ TypeScript ให้ทำงานกับ component, page และ data flow ของ Next.js ได้อย่างมั่นใจ",
+    durationText: "03:10:52",
+  },
+  {
+    title: "Day 5 Part 1: เริ่มต้น Nuxt 3 แบบมี type safety",
+    content: "https://www.youtube.com/watch?v=dCxSsr5xuL8",
+    contentType: "VIDEO",
+    summary:
+      "ทดลองใช้ Nuxt 3 เพื่อดูความต่างของ ecosystem ฝั่ง Vue พร้อม pattern การตั้งค่า composable และ routing แบบปลอดภัยขึ้น",
+    durationText: "02:31:58",
+  },
+  {
+    title: "Day 5 Part 2: Angular fundamentals สำหรับคนเริ่มจาก TypeScript",
+    content: "https://www.youtube.com/watch?v=Ata9cSC2WpM",
+    contentType: "VIDEO",
+    summary:
+      "เรียนรู้โครงของ Angular, component lifecycle และเหตุผลที่ Angular เป็น framework ที่เห็นประโยชน์ของ TypeScript ชัดเจนมาก",
+    durationText: "00:37:45",
+  },
+  {
+    title: "Day 6 Part 1: Node.js backend foundations",
+    content: "https://www.youtube.com/watch?v=ENrzD9HAZK4",
+    contentType: "VIDEO",
+    summary:
+      "เข้าใจ runtime ฝั่ง server, package ecosystem, environment setup และ flow พื้นฐานของ backend ที่จะใช้ร่วมกับ TypeScript ต่อได้",
+    durationText: "02:32:49",
+  },
+  {
+    title: "Day 6 Part 2: Express routing และ API workshop",
+    content: "https://www.youtube.com/watch?v=YrFEaEcYrU4",
+    contentType: "VIDEO",
+    summary:
+      "ลงมือทำ route, middleware และ API patterns ที่เป็นรากฐานของ backend workshop ก่อนต่อยอดสู่ระบบ production จริง",
+    durationText: "01:03:44",
+  },
+  {
+    title: "Day 7 Part 1: Tailwind CSS กับ UI workflow ยุคใหม่",
+    content: "https://www.youtube.com/watch?v=mr15Xzb1Ook",
+    contentType: "VIDEO",
+    summary:
+      "ปรับความเข้าใจเรื่อง utility-first CSS, design tokens และวิธีทำงานร่วมกับ TypeScript app ให้ไวขึ้นโดยยังคุมโครงสร้างได้ดี",
+    durationText: "00:49:45",
+  },
+  {
+    title: "Day 7 Part 2: Bun, build และ deployment wrap-up",
+    content: "https://www.youtube.com/watch?v=M4TufsFlv_o",
+    contentType: "VIDEO",
+    summary:
+      "ปิดท้ายด้วย Bun, แนวคิดเรื่อง tooling ที่เร็วขึ้น และภาพรวมการ build/deploy โปรเจกต์ TypeScript หลาย framework ให้พร้อมใช้จริง",
+    durationText: "03:05:31",
+  },
+]
+
 const COURSE_CATALOG: SeedCourse[] = [
+  {
+    title: "พื้นฐาน TypeScript และ Frameworks Workshop",
+    description:
+      "คอร์สตัวอย่างสำหรับทดสอบ lesson preview แบบหลายคลิป โดยอิงโครงหัวข้อจากหน้าคอร์ส TypeScript Frameworks ของ GeniusHub ทั้งภาพรวม TypeScript, Next.js, Nuxt.js, Angular, Node.js, Express, Tailwind CSS และ Bun พร้อมให้ลอง flow การปลดล็อกบทเรียนแบบ preview ก่อนซื้อได้จริง",
+    price: 3290,
+    thumbnailUrl: HERO_THUMB,
+    question: "หัวใจของคอร์สนี้คืออะไร?",
+    choices: [
+      "ดูคลิปให้ครบอย่างเดียว",
+      "เอา TypeScript ไปต่อกับ framework หลายตัวได้อย่างเป็นระบบ",
+      "เรียน CSS อย่างเดียว",
+      "ข้ามเรื่อง deployment ได้เลย",
+    ],
+    correctAnswer: "เอา TypeScript ไปต่อกับ framework หลายตัวได้อย่างเป็นระบบ",
+    lessons: TYPESCRIPT_FRAMEWORK_VIDEO_LESSONS,
+  },
   {
     title: "พื้นฐานระบบอัตโนมัติด้วย n8n",
     description:
@@ -367,8 +471,10 @@ async function main() {
         data: {
           courseId: course.id,
           title: lesson.title,
-          contentType: "TEXT",
+          contentType: lesson.contentType ?? "TEXT",
           content: lesson.content,
+          summary: lesson.summary ?? null,
+          durationText: lesson.durationText ?? null,
           order: index,
           isPreview: lesson.isPreview ?? false,
         },
@@ -394,9 +500,14 @@ async function main() {
     })
   }
 
-  const starterCourse = createdCourses[0]
-  const paidApprovedCourse = createdCourses[1]
-  const paidPendingCourse = createdCourses[2]
+  const typescriptCourse = createdCourses[0]
+  const starterCourse = createdCourses[1]
+  const paidApprovedCourse = createdCourses[2]
+  const paidPendingCourse = createdCourses[3]
+
+  if (!starterCourse || !paidApprovedCourse || !paidPendingCourse || !typescriptCourse) {
+    throw new Error("Seed courses were not created as expected")
+  }
 
   await db.progress.createMany({
     data: [
@@ -457,6 +568,67 @@ async function main() {
           {
             courseId: paidPendingCourse.id,
             price: paidPendingCourse.price,
+          },
+        ],
+      },
+    },
+  })
+
+  await db.courseReview.createMany({
+    data: [
+      {
+        courseId: starterCourse.id,
+        userId: student.id,
+        rating: 5,
+        review: "คอร์สเปิดโลก workflow มาก เหมาะใช้เป็นจุดเริ่มต้นก่อนต่อยอดคอร์สที่ซับซ้อนขึ้น",
+      },
+      {
+        courseId: paidApprovedCourse.id,
+        userId: student.id,
+        rating: 5,
+        review: "ชอบ flow จาก Google Sheets ไปสู่ creative asset มาก ใช้เป็นต้นแบบระบบขายได้จริง",
+      },
+      {
+        courseId: typescriptCourse.id,
+        userId: admin.id,
+        rating: 4,
+        review: "คอร์สตัวอย่างนี้ตั้งใจไว้เพื่อทดสอบ lesson preview แบบหลายคลิปและโครงคอร์สวิดีโอขนาดยาว",
+      },
+    ],
+  })
+
+  await db.discussionThread.create({
+    data: {
+      courseId: starterCourse.id,
+      userId: student.id,
+      title: "ถ้าจะเริ่มทำ workflow แรกควรวาด flow ก่อนหรือเริ่มต่อ node เลยดี?",
+      content:
+        "ผมกำลังลองคอร์สพื้นฐาน n8n อยู่ อยากทราบว่าควรเริ่มจากวาดภาพรวม trigger-input-output ก่อนหรือเริ่มต่อ node ทดลองทีละส่วนก่อนดีครับ",
+      replies: {
+        create: [
+          {
+            userId: admin.id,
+            content: "แนะนำให้เริ่มจากภาพรวมก่อน แล้วค่อยแตก node ย่อยทีละช่วง จะช่วยลดการแก้ workflow ย้อนกลับบ่อย ๆ ครับ",
+          },
+        ],
+      },
+    },
+  })
+
+  await db.discussionThread.create({
+    data: {
+      courseId: typescriptCourse.id,
+      lessonId: typescriptCourse.lessonIds[0],
+      userId: student.id,
+      title: "บท preview นี้ควรดูจบก่อนค่อยข้ามไป Next.js ไหม",
+      content:
+        "ผมมีพื้นฐาน JavaScript อยู่แล้ว แต่อยากเข้า Next.js เร็ว ๆ ควรดู TypeScript intro และ syntax ให้จบก่อนหรือเปิดข้ามไปดูบท framework ได้เลยครับ",
+      replies: {
+        create: [
+          {
+            userId: admin.id,
+            content:
+              "แนะนำให้ดู preview สองบทแรกให้จบก่อนครับ เพราะคอร์สที่เหลือจะอ้างอิงเรื่อง type, function signature และโครงสร้างโปรเจกต์ตลอดทั้งชุด",
           },
         ],
       },

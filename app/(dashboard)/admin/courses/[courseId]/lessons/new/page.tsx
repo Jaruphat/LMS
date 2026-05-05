@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import { LessonForm } from "@/components/lesson/LessonForm"
+import { getVideoUploadMode } from "@/lib/uploads"
 
 export default async function NewLessonPage({
   params,
@@ -8,6 +9,7 @@ export default async function NewLessonPage({
   params: Promise<{ courseId: string }>
 }) {
   const { courseId } = await params
+  const videoUploadMode = getVideoUploadMode()
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -21,7 +23,7 @@ export default async function NewLessonPage({
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6">
         <h1 className="mb-6 text-2xl font-bold text-slate-900">เพิ่มบทเรียนใหม่</h1>
-        <LessonForm courseId={courseId} mode="create" />
+        <LessonForm courseId={courseId} mode="create" videoUploadMode={videoUploadMode} />
       </div>
     </div>
   )

@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { z } from "zod"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { averageRatingFromEntries } from "@/lib/engagement"
 import { requireRole } from "@/lib/api"
 
 const thumbnailUrlSchema = z.union([z.string().url(), z.string().startsWith("/")])
@@ -28,12 +29,17 @@ export async function GET(
     include: {
       lessons: { orderBy: { order: "asc" } },
       creator: { select: { id: true, email: true } },
-      _count: { select: { lessons: true, enrollments: true } },
+      reviews: { select: { rating: true } },
+      _count: { select: { lessons: true, enrollments: true, reviews: true } },
     },
   })
 
   if (!course) return NextResponse.json({ error: "Not found" }, { status: 404 })
-  return NextResponse.json(course)
+  return NextResponse.json({
+    ...course,
+    ratingAverage: averageRatingFromEntries(course.reviews),
+    ratingCount: course.reviews.length,
+  })
 }
 
 export async function PATCH(

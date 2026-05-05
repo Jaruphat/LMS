@@ -1,9 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link"
-import { Lock, PlayCircle, Eye, ChevronLeft, BookOpen } from "lucide-react"
+import { ChevronLeft, BookOpen, Eye, Lock, MessageSquareText, PlayCircle, Star } from "lucide-react"
 import { notFound } from "next/navigation"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
-import { getCourse, getCourseAccessState, getCourseProgress } from "@/lib/data"
+import { CourseChatbot } from "@/components/chatbot/CourseChatbot"
+import { DiscussionBoard } from "@/components/community/DiscussionBoard"
+import { ViewTracker } from "@/components/engagement/ViewTracker"
+import { CourseRatingPanel } from "@/components/reviews/CourseRatingPanel"
+import {
+  canJoinCourseDiscussion,
+  canReviewCourse,
+  getCourse,
+  getCourseAccessState,
+  getCourseDiscussionThreads,
+  getCourseProgress,
+  getCourseReviews,
+} from "@/lib/data"
 import { formatPrice } from "@/lib/format"
 
 export default async function CourseDetailPage({
@@ -21,10 +33,21 @@ export default async function CourseDetailPage({
 
   if (!course) notFound()
 
+  const [reviews, threads, reviewAllowed, discussionAllowed] = await Promise.all([
+    getCourseReviews(courseId),
+    getCourseDiscussionThreads(courseId),
+    canReviewCourse(courseId),
+    canJoinCourseDiscussion(courseId),
+  ])
+
   const firstVisibleLesson = course.lessons.find((lesson) => accessState?.hasFullAccess || lesson.isPreview)
+  const previewLessons = course.lessons.filter((lesson) => lesson.isPreview)
+  const videoLessons = course.lessons.filter((lesson) => lesson.contentType === "VIDEO")
 
   return (
     <div className="mx-auto max-w-6xl">
+      <ViewTracker endpoint={`/api/courses/${course.id}/views`} storageKey={`course-view:${course.id}`} />
+
       <Link href="/courses" className="mb-6 inline-flex items-center gap-1 text-sm text-slate-400 transition-colors hover:text-slate-700">
         <ChevronLeft className="h-4 w-4" />
         กลับไปหน้าคอร์ส
@@ -53,6 +76,9 @@ export default async function CourseDetailPage({
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
                   {course._count.enrollments} ผู้เรียน
                 </span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                  {previewLessons.length} preview
+                </span>
               </div>
 
               <h1 className="mb-3 text-3xl font-bold text-slate-900">{course.title}</h1>
@@ -61,11 +87,49 @@ export default async function CourseDetailPage({
             </div>
           </div>
 
+          <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-amber-500">
+                <Star className="h-4 w-4 fill-amber-400" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]">Rating</span>
+              </div>
+              <p className="mt-3 text-3xl font-black text-slate-950">{course.ratingAverage.toFixed(1)}</p>
+              <p className="mt-1 text-sm text-slate-500">{course.ratingCount} รีวิว</p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-cyan-600">
+                <Eye className="h-4 w-4" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]">Views</span>
+              </div>
+              <p className="mt-3 text-3xl font-black text-slate-950">{course.viewCount}</p>
+              <p className="mt-1 text-sm text-slate-500">ยอดเข้าชมหน้าคอร์ส</p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-indigo-600">
+                <PlayCircle className="h-4 w-4" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]">Video Lessons</span>
+              </div>
+              <p className="mt-3 text-3xl font-black text-slate-950">{videoLessons.length}</p>
+              <p className="mt-1 text-sm text-slate-500">คลิปวิดีโอในคอร์สนี้</p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-2 text-emerald-600">
+                <MessageSquareText className="h-4 w-4" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]">Preview</span>
+              </div>
+              <p className="mt-3 text-3xl font-black text-slate-950">{previewLessons.length}</p>
+              <p className="mt-1 text-sm text-slate-500">บทที่เปิดให้ทดลองเรียน</p>
+            </div>
+          </div>
+
           <div className="rounded-3xl border border-slate-200 bg-white">
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">บทเรียนในคอร์ส</h2>
-                <p className="text-sm text-slate-500">บทเรียน preview ดูได้ก่อนซื้อ ที่เหลือต้องมี enrollment</p>
+                <p className="text-sm text-slate-500">บทเรียน preview ดูได้ก่อนซื้อ ส่วนบทที่เหลือต้องมีสิทธิ์เข้าเรียน</p>
               </div>
               <span className="text-sm text-slate-400">{course.lessons.length} รายการ</span>
             </div>
@@ -80,20 +144,23 @@ export default async function CourseDetailPage({
 
                   const content = (
                     <>
-                      <div className="flex items-center gap-4">
-                        <span className="w-6 text-right text-sm text-slate-300">{index + 1}</span>
+                      <div className="flex items-start gap-4">
+                        <span className="w-6 pt-0.5 text-right text-sm text-slate-300">{index + 1}</span>
                         {lesson.isPreview ? (
-                          <Eye className="h-4 w-4 text-cyan-500" />
+                          <Eye className="mt-0.5 h-4 w-4 text-cyan-500" />
                         ) : canOpen ? (
-                          <PlayCircle className="h-4 w-4 text-indigo-500" />
+                          <PlayCircle className="mt-0.5 h-4 w-4 text-indigo-500" />
                         ) : (
-                          <Lock className="h-4 w-4 text-slate-300" />
+                          <Lock className="mt-0.5 h-4 w-4 text-slate-300" />
                         )}
                         <div>
                           <p className="text-sm font-medium text-slate-700">{lesson.title}</p>
                           <p className="text-xs text-slate-400">
                             {lesson.isPreview ? "Preview" : canOpen ? "เปิดเรียนได้" : "ต้องซื้อก่อน"}
+                            {lesson.durationText ? ` • ${lesson.durationText}` : ""}
+                            {lesson.viewCount > 0 ? ` • ดูแล้ว ${lesson.viewCount}` : ""}
                           </p>
+                          {lesson.summary ? <p className="mt-1 text-xs leading-6 text-slate-500">{lesson.summary}</p> : null}
                         </div>
                       </div>
                       {isDone && <span className="text-xs font-medium text-emerald-600">เรียนแล้ว</span>}
@@ -181,6 +248,27 @@ export default async function CourseDetailPage({
             )}
           </div>
         </aside>
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <CourseRatingPanel
+          courseId={course.id}
+          initialReviews={reviews}
+          initialRatingAverage={course.ratingAverage}
+          initialRatingCount={course.ratingCount}
+          canReview={reviewAllowed}
+        />
+        <CourseChatbot courseId={course.id} courseTitle={course.title} />
+      </div>
+
+      <div className="mt-6">
+        <DiscussionBoard
+          courseId={course.id}
+          title="เว็บบอร์ดคอร์ส"
+          description="ใช้ถามคำถาม แชร์สิ่งที่ลองทำ หรือคุยเรื่อง workflow และบทเรียนในคอร์สนี้กับผู้เรียนคนอื่น"
+          canPost={discussionAllowed}
+          initialThreads={threads}
+        />
       </div>
     </div>
   )

@@ -3,10 +3,19 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test"
 const studentEmail = `playwright.student.${Date.now()}@example.com`
 const studentPassword = "Playwright123!"
 const createdCourseTitle = `คอร์สทดสอบ Playwright ${Date.now()}`
+const discussionTitle = `คำถามจาก Playwright ${Date.now()}`
+const discussionContent = "อยากลองระบบ webboard ว่าตั้งกระทู้และแสดงผลบนหน้าคอร์สได้จริงหรือไม่"
+const studentReviewText = `รีวิวจาก Playwright ${Date.now()}`
 const seededPaidCourseTitle = "โรงงานสร้างครีเอทีฟโฆษณา AI จาก Google Sheets"
 const seededFreeCourseTitle = "พื้นฐานระบบอัตโนมัติด้วย n8n"
+const seededPreviewVideoCourseTitle = "พื้นฐาน TypeScript และ Frameworks Workshop"
+const seededPreviewVideoLessonTitle = "Day 1: Introduction to TypeScript และการเตรียมเครื่องมือ"
 const seededFreeQuizCorrectChoice = "วางแผน workflow"
 const slipFixturePath = "C:\\AI\\LMS\\lms\\public\\images\\generated\\course-showcase-mockup.png"
+const uploadedMp4LessonTitle = `à¸§à¸´à¸”à¸µà¹‚à¸­ MP4 à¸ˆà¸²à¸ Playwright ${Date.now()}`
+const uploadedWebmLessonTitle = `à¸§à¸´à¸”à¸µà¹‚à¸­ WebM à¸ˆà¸²à¸ Playwright ${Date.now()}`
+const uploadedMp4FixturePath = "C:\\AI\\LMS\\lms\\tests\\fixtures\\videos\\flower.mp4"
+const uploadedWebmFixturePath = "C:\\AI\\LMS\\lms\\tests\\fixtures\\videos\\flower.webm"
 
 async function capture(page: Page, testInfo: TestInfo, name: string) {
   const path = testInfo.outputPath(`${name}.png`)
@@ -84,6 +93,41 @@ test.describe.serial("LearnHub smoke suite", () => {
     await expect(page.getByText(seededFreeCourseTitle)).toBeVisible()
   })
 
+  test("guest can preview a video lesson with chatbot and lesson webboard", async ({ page }, testInfo) => {
+    await page.goto("/courses", { waitUntil: "networkidle" })
+    await page.getByRole("link", { name: new RegExp(seededPreviewVideoCourseTitle, "i") }).first().click()
+    await page.waitForLoadState("networkidle")
+    await expect(page.getByText(seededPreviewVideoCourseTitle)).toBeVisible()
+    await expect(page.getByText("2 preview")).toBeVisible()
+
+    await page.getByRole("link", { name: new RegExp(seededPreviewVideoLessonTitle, "i") }).click()
+    await page.waitForLoadState("networkidle")
+
+    await expect(page.getByText(seededPreviewVideoLessonTitle)).toBeVisible()
+    await expect(page.getByTestId("lesson-video-embed")).toBeVisible()
+    await expect(page.getByTestId("course-chatbot")).toBeVisible()
+    await expect(page.getByTestId("discussion-board")).toBeVisible()
+    await capture(page, testInfo, "guest-preview-video-lesson")
+  })
+
+  test("student can submit a rating and create a discussion thread", async ({ page }, testInfo) => {
+    await login(page, studentEmail, studentPassword)
+
+    await page.goto("/courses", { waitUntil: "networkidle" })
+    await page.getByRole("link", { name: new RegExp(seededFreeCourseTitle, "i") }).first().click()
+    await page.waitForLoadState("networkidle")
+
+    await page.getByTestId("course-review-input").fill(studentReviewText)
+    await page.getByTestId("course-review-submit").click()
+    await expect(page.getByText(studentReviewText)).toBeVisible()
+
+    await page.getByTestId("thread-title-input").fill(discussionTitle)
+    await page.getByTestId("thread-content-input").fill(discussionContent)
+    await page.getByTestId("thread-submit").click()
+    await expect(page.getByText(discussionTitle)).toBeVisible()
+    await capture(page, testInfo, "student-rating-and-webboard")
+  })
+
   test("guest can submit the free-course quiz and see the result immediately", async ({ page }, testInfo) => {
     await page.goto("/courses", { waitUntil: "networkidle" })
     await page.getByRole("link", { name: new RegExp(seededFreeCourseTitle, "i") }).first().click()
@@ -120,6 +164,87 @@ test.describe.serial("LearnHub smoke suite", () => {
 
     await expect(page.getByText(createdCourseTitle)).toBeVisible()
     await capture(page, testInfo, "admin-courses-after-create")
+  })
+
+  test("admin can upload real video lesson files and preview them", async ({ page }, testInfo) => {
+    test.setTimeout(180000)
+
+    await login(page, "admin@lms.dev", "admin1234")
+
+    await page.goto("/admin/courses", { waitUntil: "networkidle" })
+
+    const courseCard = page
+      .locator("div.rounded-3xl")
+      .filter({ has: page.getByRole("heading", { name: createdCourseTitle }) })
+      .first()
+
+    await expect(courseCard).toBeVisible()
+    await courseCard.locator('a[href^="/admin/courses/"]:not([href$="/edit"])').click()
+    await page.waitForLoadState("networkidle")
+
+    await page.locator('a[href$="/lessons/new"]').click()
+    await expect(page.getByTestId("lesson-form")).toHaveAttribute("data-client-ready", "true", { timeout: 15000 })
+    await page.getByTestId("lesson-title-input").fill(uploadedMp4LessonTitle)
+    await page.getByTestId("lesson-summary-input").fill("ทดสอบอัปโหลดไฟล์ MP4 จริงจากฟอร์มบทเรียน")
+    await page.getByTestId("lesson-content-type-input").selectOption("VIDEO")
+    await page.getByTestId("lesson-order-input").fill("1")
+    await page.getByTestId("lesson-duration-input").fill("00:30")
+    await page.getByTestId("lesson-preview-toggle").check()
+    await page.getByTestId("lesson-video-upload-input").setInputFiles(uploadedMp4FixturePath)
+    await page.getByTestId("lesson-video-upload-button").click()
+    await expect(page.getByTestId("lesson-video-upload-status")).toContainText("อัปโหลดสำเร็จ", {
+      timeout: 120000,
+    })
+    await expect(page.getByTestId("lesson-video-url-input")).toHaveValue(/(blob\.vercel-storage\.com|\/uploads\/videos\/)/)
+    await capture(page, testInfo, "admin-lesson-upload-mp4")
+
+    await Promise.all([
+      page.waitForURL(/\/admin\/courses\/[^/]+$/),
+      page.getByTestId("lesson-submit").click(),
+    ])
+
+    await page.locator('a[href$="/lessons/new"]').click()
+    await expect(page.getByTestId("lesson-form")).toHaveAttribute("data-client-ready", "true", { timeout: 15000 })
+    await page.getByTestId("lesson-title-input").fill(uploadedWebmLessonTitle)
+    await page.getByTestId("lesson-summary-input").fill("ทดสอบอัปโหลดไฟล์ WebM จริงจากฟอร์มบทเรียน")
+    await page.getByTestId("lesson-content-type-input").selectOption("VIDEO")
+    await page.getByTestId("lesson-order-input").fill("2")
+    await page.getByTestId("lesson-duration-input").fill("00:30")
+    await page.getByTestId("lesson-video-upload-input").setInputFiles(uploadedWebmFixturePath)
+    await page.getByTestId("lesson-video-upload-button").click()
+    await expect(page.getByTestId("lesson-video-upload-status")).toContainText("อัปโหลดสำเร็จ", {
+      timeout: 120000,
+    })
+    await expect(page.getByTestId("lesson-video-url-input")).toHaveValue(/(blob\.vercel-storage\.com|\/uploads\/videos\/)/)
+    await capture(page, testInfo, "admin-lesson-upload-webm")
+
+    await Promise.all([
+      page.waitForURL(/\/admin\/courses\/[^/]+$/),
+      page.getByTestId("lesson-submit").click(),
+    ])
+
+    const courseId = page.url().match(/\/admin\/courses\/([^/]+)$/)?.[1]
+    if (!courseId) {
+      throw new Error("Could not resolve the admin course id after saving lessons.")
+    }
+
+    const uploadedLessonEditLink = page
+      .locator("div.rounded-2xl")
+      .filter({ hasText: uploadedMp4LessonTitle })
+      .locator('a[href*="/lessons/"][href$="/edit"]')
+      .first()
+
+    await expect(uploadedLessonEditLink).toBeVisible()
+    const lessonEditHref = await uploadedLessonEditLink.getAttribute("href")
+    const lessonId = lessonEditHref?.match(/\/lessons\/([^/]+)\/edit$/)?.[1]
+
+    if (!lessonId) {
+      throw new Error("Could not resolve the uploaded lesson id from the admin page.")
+    }
+
+    await page.goto(`/courses/${courseId}/lessons/${lessonId}`, { waitUntil: "networkidle" })
+    await expect(page.getByTestId("lesson-video-player")).toBeVisible()
+    await capture(page, testInfo, "uploaded-video-lesson-preview")
   })
 
   test("student can place a paid order with slip upload", async ({ page }, testInfo) => {

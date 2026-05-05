@@ -2,51 +2,69 @@ import { cache } from "react"
 import { getServerSession } from "next-auth"
 import { authOptions, resolveSessionUser } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { averageRatingFromEntries } from "@/lib/engagement"
 
 export const getCurrentUser = cache(async () => {
   const session = await getServerSession(authOptions)
   return resolveSessionUser(session?.user)
 })
 
+function withCourseStats<T extends { reviews: Array<{ rating: number }> }>(course: T) {
+  return {
+    ...course,
+    ratingAverage: averageRatingFromEntries(course.reviews),
+    ratingCount: course.reviews.length,
+  }
+}
+
 export async function getPublicCourses() {
-  return db.course.findMany({
+  const courses = await db.course.findMany({
     where: { status: "PUBLISHED" },
     orderBy: { createdAt: "desc" },
     include: {
       creator: { select: { email: true } },
-      _count: { select: { lessons: true, enrollments: true } },
+      reviews: { select: { rating: true } },
+      _count: { select: { lessons: true, enrollments: true, reviews: true } },
     },
   })
+
+  return courses.map(withCourseStats)
 }
 
 export async function getAdminCourses() {
-  return db.course.findMany({
+  const courses = await db.course.findMany({
     orderBy: { createdAt: "desc" },
     include: {
       creator: { select: { email: true } },
-      _count: { select: { lessons: true, enrollments: true } },
+      reviews: { select: { rating: true } },
+      _count: { select: { lessons: true, enrollments: true, reviews: true } },
     },
   })
+
+  return courses.map(withCourseStats)
 }
 
 export async function getCourse(id: string) {
   const user = await getCurrentUser()
 
-  return db.course.findFirst({
+  const course = await db.course.findFirst({
     where: user?.role === "ADMIN" ? { id } : { id, status: "PUBLISHED" },
     include: {
       lessons: { orderBy: { order: "asc" } },
       creator: { select: { email: true } },
-      _count: { select: { lessons: true, enrollments: true } },
+      reviews: { select: { rating: true } },
+      _count: { select: { lessons: true, enrollments: true, reviews: true } },
     },
   })
+
+  return course ? withCourseStats(course) : null
 }
 
 export async function getAdminCourse(id: string) {
   const user = await getCurrentUser()
   if (user?.role !== "ADMIN") return null
 
-  return db.course.findFirst({
+  const course = await db.course.findFirst({
     where: { id },
     include: {
       lessons: {
@@ -56,9 +74,12 @@ export async function getAdminCourse(id: string) {
         },
       },
       creator: { select: { email: true } },
-      _count: { select: { enrollments: true } },
+      reviews: { select: { rating: true } },
+      _count: { select: { enrollments: true, reviews: true } },
     },
   })
+
+  return course ? withCourseStats(course) : null
 }
 
 export async function getCourseAccessState(courseId: string) {
@@ -272,5 +293,152 @@ export async function getAdminDashboardData() {
       revenue,
     },
     recentOrders,
+  }
+}
+
+export async function getCourseReviews(courseId: string) {
+  return db.courseReview.findMany({
+    where: { courseId },
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
+    },
+  })
+}
+
+export async function getCourseDiscussionThreads(courseId: string, lessonId?: string) {
+  return db.discussionThread.findMany({
+    where: {
+      courseId,
+      ...(lessonId ? { lessonId } : { lessonId: null }),
+    },
+    orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }],
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
+      replies: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
+export async function canReviewCourse(courseId: string) {
+  const user = await getCurrentUser()
+  if (!user) return false
+  if (user.role === "ADMIN") return true
+
+  return hasCourseAccess(courseId, user.id, user.role)
+}
+
+export async function canJoinCourseDiscussion(courseId: string, lessonId?: string) {
+  const user = await getCurrentUser()
+  if (!user) return false
+  if (user.role === "ADMIN") return true
+
+  if (lessonId) {
+    const lesson = await db.lesson.findFirst({
+      where: { id: lessonId, courseId },
+      include: {
+        course: {
+          select: {
+            status: true,
+            price: true,
+          },
+        },
+      },
+    })
+
+    if (!lesson || lesson.course.status !== "PUBLISHED") return false
+    if (lesson.isPreview || lesson.course.price === 0) return true
+  }
+
+  return hasCourseAccess(courseId, user.id, user.role)
+}
+
+export async function getCourseChatbotContext(courseId: string) {
+  const user = await getCurrentUser()
+
+  const course = await db.course.findFirst({
+    where: user?.role === "ADMIN" ? { id: courseId } : { id: courseId, status: "PUBLISHED" },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      price: true,
+      lessons: {
+        orderBy: { order: "asc" },
+        select: {
+          id: true,
+          title: true,
+          contentType: true,
+          content: true,
+          summary: true,
+          durationText: true,
+          isPreview: true,
+        },
+      },
+    },
+  })
+
+  if (!course) return null
+  if (user?.role === "ADMIN" || course.price === 0) return course
+  if (!user) {
+    return {
+      ...course,
+      lessons: course.lessons.map((lesson) =>
+        lesson.isPreview
+          ? lesson
+          : {
+              ...lesson,
+              summary: null,
+              content: lesson.title,
+            }
+      ),
+    }
+  }
+
+  const enrollment = await db.enrollment.findUnique({
+    where: {
+      userId_courseId: {
+        userId: user.id,
+        courseId,
+      },
+    },
+  })
+
+  if (enrollment) return course
+
+  return {
+    ...course,
+    lessons: course.lessons.map((lesson) =>
+      lesson.isPreview
+        ? lesson
+        : {
+            ...lesson,
+            summary: null,
+            content: lesson.title,
+          }
+    ),
   }
 }

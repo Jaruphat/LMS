@@ -1,10 +1,8 @@
 # LMS Project Tasks
 
-> Updated: `2026-05-04`
+> Updated: `2026-05-05`
 > Application repo: `lms/`
-> Status: `MVP ready locally`
-
----
+> Status: `MVP ready and redeploy pending for latest media updates`
 
 ## MVP Release Status
 
@@ -12,135 +10,67 @@
 - [x] Commerce flow พร้อมใช้งาน
 - [x] Public storefront พร้อมใช้งาน
 - [x] Admin dashboard และ order review พร้อมใช้งาน
-- [x] Lint ผ่าน
-- [x] Build ผ่าน
-- [x] E2E smoke tests ผ่าน `7/7`
+- [x] Engagement layer พร้อมใช้งาน (`rating`, `webboard`, `chatbot`, `counter`)
+- [x] Real video upload for admin lessons พร้อมใช้งาน
+- [x] `npm run lint`
+- [x] `npm run build`
+- [x] `npm run test:e2e` ผ่าน `10/10`
 
----
+## Completed Scope
 
-## Phase 1 — Core LMS
+### Phase 1 — Core LMS
 
-### Auth
-
-- [x] Register API + UI
-- [x] Login with NextAuth credentials
-- [x] Session-based route protection
+- [x] Register / Login / Session guard
 - [x] Admin role guard
-
-### Course Management
-
-- [x] Prisma models: `User`, `Course`, `Lesson`
-- [x] Admin create course
-- [x] Admin update course
-- [x] Admin delete course
-- [x] Public course list
-- [x] Public course detail
-- [x] Public vs protected access rules
-
-### Lesson, Quiz, Progress
-
-- [x] Admin create lesson
-- [x] Admin update lesson
-- [x] Admin delete lesson
-- [x] Lesson viewer (video + markdown)
-- [x] Quiz create
+- [x] Course CRUD
+- [x] Lesson CRUD
 - [x] Quiz submit
 - [x] Progress tracking
+- [x] Public vs protected lesson access
 
----
+### Phase 2 — Commerce
 
-## Phase 2 — Commerce
-
-### Data Model
-
-- [x] `price`
-- [x] `thumbnailUrl`
-- [x] `status`
-- [x] `isPreview`
-- [x] `Order`
-- [x] `OrderItem`
-- [x] `Enrollment`
-
-### Student Flow
-
-- [x] Cart stored in `localStorage`
-- [x] Cart page
-- [x] Checkout page
-- [x] Create order from selected courses
+- [x] Course pricing + publish status
+- [x] Cart + checkout
 - [x] Upload payment slip
-- [x] Student order history
-- [x] Student my courses page
+- [x] Orders management
+- [x] Approve / reject flow
+- [x] Enrollment auto-create
+- [x] Student my courses / order history
 
-### Admin Flow
+### Phase 3 — Public / Engagement
 
-- [x] Admin dashboard stats
-- [x] Recent orders widget
-- [x] Orders management page
-- [x] Approve order
-- [x] Reject order
-- [x] Auto-create enrollment after approval
+- [x] `/courses`, `/about`, `/contact`
+- [x] Thai-first storefront
+- [x] Custom 404
+- [x] Course rating / review
+- [x] Course + lesson webboard
+- [x] Course chatbot
+- [x] Course / lesson view counters
 
-### Access Control
+### Phase 4 — Media / Deployment
 
-- [x] Free course lessons accessible without purchase
-- [x] Preview lessons accessible before purchase
-- [x] Locked lessons require approved enrollment
-- [x] Admin can access draft + published content
+- [x] Vercel Blob support for slip upload
+- [x] Real admin video upload with local fallback
+- [x] MP4 / WebM preview verified via Playwright
+- [ ] Redeploy production with latest media changes
 
----
+## Deployment Checklist
 
-## Phase 3 — Public Site
-
-- [x] `/courses` storefront page
-- [x] `/about`
-- [x] `/contact`
-- [x] Public course detail with preview lessons
-- [x] Custom `404 fallback`
-- [x] Thai-first public content
-- [ ] Dedicated marketing home page separate from `/courses`
-- [ ] Forgot password
-- [ ] Reset password
-
----
-
-## Phase 4 - Polish / Production Hardening
-
-- [ ] Drag-and-drop lesson reorder
-- [ ] Course search and filtering
-- [ ] Email notifications
-- [ ] Certificate generation
-- [x] Add Vercel Blob support for slip upload with local fallback
-- [ ] Production deployment verification on Vercel
-
----
-
-## GitHub Readiness
-
-- [x] README updated for real project setup
-- [x] `.env.example` added
-- [x] `.gitignore` updated for logs and uploaded slips
+- [x] README updated
+- [x] `.env.example` updated
+- [x] `.gitignore` covers local uploads and logs
 - [x] Repo docs mirrored inside `docs/`
-- [x] Local verification captured
-
----
-
-## Vercel Preparation
-
-- [ ] Create production PostgreSQL database
-- [ ] Set `DATABASE_URL`
-- [ ] Set `NEXTAUTH_SECRET`
-- [ ] Set `NEXTAUTH_URL`
-- [ ] Set `BLOB_READ_WRITE_TOKEN`
-- [ ] Import GitHub repo into Vercel
-- [ ] Run post-deploy smoke tests
-
----
+- [ ] Push latest commit to GitHub
+- [ ] Trigger new Vercel deployment
+- [ ] Smoke test production after redeploy
 
 ## Post-MVP Backlog
 
 1. Dedicated landing page at `/`
-2. Forgot/reset password
-3. Search + filter
-4. Lesson reorder UX
-5. Vercel project env + Blob store wiring
-6. Production deploy + monitoring
+2. Forgot / reset password
+3. Search and filter
+4. Drag-and-drop lesson ordering
+5. Email notifications
+6. Certificate generation
+7. Analytics / moderation hardening for engagement features

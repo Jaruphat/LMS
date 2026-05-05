@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { db } from "@/lib/db"
+import { averageRatingFromEntries } from "@/lib/engagement"
 import { requireRole } from "@/lib/api"
 
 const thumbnailUrlSchema = z.union([z.string().url(), z.string().startsWith("/")])
@@ -19,10 +20,17 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
     include: {
       creator: { select: { id: true, email: true } },
-      _count: { select: { lessons: true, enrollments: true } },
+      reviews: { select: { rating: true } },
+      _count: { select: { lessons: true, enrollments: true, reviews: true } },
     },
   })
-  return NextResponse.json(courses)
+  return NextResponse.json(
+    courses.map((course) => ({
+      ...course,
+      ratingAverage: averageRatingFromEntries(course.reviews),
+      ratingCount: course.reviews.length,
+    }))
+  )
 }
 
 export async function POST(req: NextRequest) {

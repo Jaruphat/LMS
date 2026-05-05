@@ -176,7 +176,7 @@ export default async function CoursesPage() {
             <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
               รายการคอร์ส
             </span>
-            <h2 className="text-3xl font-black text-slate-950">10 คอร์สพร้อมใช้งานกับ flow ซื้อคอร์ส ชำระเงิน และอนุมัติคำสั่งซื้อ</h2>
+            <h2 className="text-3xl font-black text-slate-950">{courses.length} คอร์สพร้อมใช้งานกับ flow ซื้อคอร์ส ชำระเงิน และอนุมัติคำสั่งซื้อ</h2>
             <p className="max-w-3xl text-base leading-8 text-slate-600">
               คอร์สทั้งหมดถูก publish และเชื่อมเข้ากับ commerce flow ปัจจุบันแล้ว ทั้ง cart, checkout, อัปโหลดสลิป,
               การอนุมัติโดยแอดมิน และการสร้างสิทธิ์เรียนหลังอนุมัติ

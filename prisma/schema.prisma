@@ -18,12 +18,16 @@ model User {
   role           Role          @default(STUDENT)
   createdAt      DateTime      @default(now())
 
-  createdCourses Course[]      @relation("CreatedCourses")
-  attempts       QuizAttempt[]
-  progress       Progress[]
-  orders         Order[]       @relation("StudentOrders")
-  enrollments    Enrollment[]
-  reviewedOrders Order[]       @relation("OrderReviewer")
+  createdCourses     Course[]            @relation("CreatedCourses")
+  attempts           QuizAttempt[]
+  progress           Progress[]
+  orders             Order[]             @relation("StudentOrders")
+  enrollments        Enrollment[]
+  reviewedOrders     Order[]             @relation("OrderReviewer")
+  courseReviews      CourseReview[]
+  discussionThreads  DiscussionThread[]
+  discussionReplies  DiscussionReply[]
+  chatbotMessages    CourseChatMessage[]
 }
 
 enum Role {
@@ -42,13 +46,17 @@ model Course {
   thumbnailUrl String?
   price        Float        @default(0)
   status       CourseStatus @default(DRAFT)
+  viewCount    Int          @default(0)
   createdBy    String
   createdAt    DateTime     @default(now())
 
-  creator     User         @relation("CreatedCourses", fields: [createdBy], references: [id])
-  lessons     Lesson[]
-  enrollments Enrollment[]
-  orderItems  OrderItem[]
+  creator           User                 @relation("CreatedCourses", fields: [createdBy], references: [id])
+  lessons           Lesson[]
+  enrollments       Enrollment[]
+  orderItems        OrderItem[]
+  reviews           CourseReview[]
+  discussionThreads DiscussionThread[]
+  chatbotMessages   CourseChatMessage[]
 }
 
 enum CourseStatus {
@@ -62,12 +70,16 @@ model Lesson {
   title       String
   contentType ContentType
   content     String      @db.Text
+  summary     String?     @db.Text
+  durationText String?
   order       Int
   isPreview   Boolean     @default(false)
+  viewCount   Int         @default(0)
 
-  course   Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  quizzes  Quiz[]
-  progress Progress[]
+  course            Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quizzes           Quiz[]
+  progress          Progress[]
+  discussionThreads DiscussionThread[]
 }
 
 enum ContentType {
@@ -126,6 +138,62 @@ model Enrollment {
   order  Order? @relation(fields: [orderId], references: [id])
 
   @@unique([userId, courseId])
+}
+
+model CourseReview {
+  id        String   @id @default(cuid())
+  courseId  String
+  userId    String
+  rating    Int
+  review    String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
+}
+
+model DiscussionThread {
+  id        String   @id @default(cuid())
+  courseId  String
+  lessonId  String?
+  userId    String
+  title     String
+  content   String   @db.Text
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course  Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson  Lesson?           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies DiscussionReply[]
+}
+
+model DiscussionReply {
+  id        String   @id @default(cuid())
+  threadId  String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  thread DiscussionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CourseChatMessage {
+  id        String   @id @default(cuid())
+  courseId  String
+  userId    String?
+  prompt    String   @db.Text
+  response  String   @db.Text
+  createdAt DateTime @default(now())
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 // ─────────────────────────────────────────

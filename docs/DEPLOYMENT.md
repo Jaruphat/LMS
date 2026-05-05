@@ -1,81 +1,59 @@
 # Deployment Notes
 
-> Updated: `2026-05-04`
-> Scope: GitHub push preparation + Vercel readiness for the current MVP
+> Updated: `2026-05-05`
+> Scope: GitHub push + Vercel deployment for the current MVP
 
----
-
-## Current Release Readiness
+## Current Readiness
 
 - [x] `npm run lint`
 - [x] `npm run build`
 - [x] `npm run test:e2e`
 - [x] Public pages checked
-- [x] Student purchase flow checked
+- [x] Commerce flow checked
 - [x] Admin approve flow checked
+- [x] Admin video upload + preview checked
 
----
-
-## GitHub Checklist
-
-### Before push
-
-- [x] README updated
-- [x] `.env*` ignored
-- [x] uploaded slip files ignored
-- [x] dev logs ignored
-- [x] docs included inside repo
-
-### Recommended commands
-
-```bash
-cd C:\AI\LMS\lms
-git add .
-git commit -m "Prepare LearnHub LMS MVP for GitHub and Vercel"
-git branch -M main
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
-```
-
----
-
-## Vercel Readiness
-
-### Required environment variables
+## Required Environment Variables
 
 - `DATABASE_URL`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `BLOB_READ_WRITE_TOKEN`
 
-### Optional for local migration workflow
+Optional for local migration workflow:
 
 - `SHADOW_DATABASE_URL`
 
-### Slip storage note
+## Storage Behavior
 
-ตอนนี้โค้ดรองรับ Vercel Blob แล้ว
+### Slip upload
 
-- ถ้ามี `BLOB_READ_WRITE_TOKEN` ระบบจะอัปโหลด slip ไปที่ Vercel Blob
-- ถ้ายังไม่มี token ระบบจะ fallback ไปเขียนที่ `public/uploads/` สำหรับ local development
+- ถ้ามี `BLOB_READ_WRITE_TOKEN` จะเก็บที่ Vercel Blob
+- ถ้าไม่มี token จะ fallback ไป `public/uploads/`
+- เนื่องจากเป็น server upload ควรคุม slip ไม่เกิน `4.5MB`
 
-สำหรับ preview และ production บน Vercel ควรสร้าง Blob store และผูก token ให้ครบก่อน deploy
+### Video upload
 
-ข้อจำกัดของแนวทาง server upload นี้คือควรใช้ไฟล์ไม่เกิน `4.5MB`
+- ถ้ามี `BLOB_READ_WRITE_TOKEN` หน้าแอดมินจะใช้ client upload ไป Vercel Blob โดยตรง
+- ถ้าไม่มี token จะ fallback ไป `public/uploads/videos/`
+- fixture สำหรับทดสอบอยู่ที่ `tests/fixtures/videos/flower.mp4` และ `tests/fixtures/videos/flower.webm`
 
----
+## GitHub Commands
 
-## Vercel Deployment Flow
+```bash
+cd C:\AI\LMS\lms
+git status
+git add .
+git commit -m "Add admin video upload flow"
+git push
+```
 
-1. Push repo ขึ้น GitHub
-2. Import repo ใน Vercel
-3. เลือก framework เป็น Next.js
-4. ตั้ง environment variables ให้ครบ
-5. Deploy preview
-6. Run smoke test
-7. Promote to production
+## Vercel Flow
 
----
+1. Push latest commit ขึ้น GitHub
+2. Trigger deployment ผ่าน Git integration หรือ `vercel --prod`
+3. รอ build ให้ผ่าน
+4. Smoke test production
 
 ## Smoke Tests After Deploy
 
@@ -86,14 +64,10 @@ git push -u origin main
 - [ ] `/contact` โหลดได้
 - [ ] `404 fallback` ทำงาน
 
-### Auth
+### Auth / Student
 
 - [ ] Register ได้
 - [ ] Login ได้
-- [ ] Role guard ทำงาน
-
-### Student
-
 - [ ] Add to cart ได้
 - [ ] Checkout ได้
 - [ ] Upload slip ได้
@@ -102,18 +76,15 @@ git push -u origin main
 ### Admin
 
 - [ ] Create course ได้
-- [ ] Create lesson ได้
+- [ ] Upload video lesson file ได้
+- [ ] Preview lesson video ที่เพิ่งอัปโหลดได้
 - [ ] Approve order ได้
 - [ ] Enrollment ถูกสร้างหลัง approve
 
----
-
 ## Rollback Notes
-
-ถ้า deploy แล้วมีปัญหา:
 
 1. rollback deployment บน Vercel ไป release ก่อนหน้า
 2. ตรวจ env vars
 3. ตรวจ database connectivity
-4. ตรวจ storage integration ของ slip upload
+4. ตรวจ Blob integration ของ slip และ video upload
 5. rerun smoke tests

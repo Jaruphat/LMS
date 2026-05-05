@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react"
 import { DeleteButton } from "@/components/admin/DeleteButton"
 import { LessonForm } from "@/components/lesson/LessonForm"
 import { db } from "@/lib/db"
+import { getVideoUploadMode } from "@/lib/uploads"
 
 export default async function EditLessonPage({
   params,
@@ -11,6 +12,7 @@ export default async function EditLessonPage({
   params: Promise<{ courseId: string; lessonId: string }>
 }) {
   const { courseId, lessonId } = await params
+  const videoUploadMode = getVideoUploadMode()
 
   const lesson = await db.lesson.findFirst({
     where: { id: lessonId, courseId },
@@ -38,10 +40,13 @@ export default async function EditLessonPage({
           courseId={courseId}
           lessonId={lesson.id}
           mode="edit"
+          videoUploadMode={videoUploadMode}
           initialValues={{
             title: lesson.title,
             contentType: lesson.contentType,
             content: lesson.content,
+            summary: lesson.summary,
+            durationText: lesson.durationText,
             order: lesson.order,
             isPreview: lesson.isPreview,
           }}

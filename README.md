@@ -1,64 +1,60 @@
 # LearnHub LMS MVP
 
-ระบบ LMS แบบ MVP สำหรับคอร์สสาย Automation, OCR, AI Ops และ manual payment approval flow
+ระบบ LMS แบบ MVP สำหรับขายและเรียนคอร์สออนไลน์สาย Automation, AI Workflow, และเทรนนิงเชิงปฏิบัติการ
 
 ## Status
 
-- MVP พร้อมใช้งานในเครื่องแล้ว
+- ใช้งานได้จริงทั้งฝั่ง public, student, และ admin
 - ผ่าน `npm run lint`
 - ผ่าน `npm run build`
-- ผ่าน `npm run test:e2e` จำนวน `7/7` เคส
-- วันที่อัปเดตสถานะล่าสุด: `2026-05-04`
+- ผ่าน `npm run test:e2e` จำนวน `10/10` เคส
+- อัปเดตล่าสุด: `2026-05-05`
 
-## Scope ที่มีจริงใน MVP
+## ฟีเจอร์หลัก
 
 ### Public
 
-- `/` redirect ไป `/courses`
-- `/courses` storefront หลักพร้อม hero banner, course catalog, และภาพ mockup
+- `/courses` storefront ภาษาไทย
 - `/courses/[courseId]` รายละเอียดคอร์ส
 - `/about`
 - `/contact`
 - `404 fallback`
 
-### Auth
-
-- สมัครสมาชิก
-- เข้าสู่ระบบด้วย NextAuth credentials
-- role guard สำหรับ `STUDENT` และ `ADMIN`
-
 ### Student
 
-- cart ด้วย `localStorage`
-- checkout
+- สมัครสมาชิก / เข้าสู่ระบบ
+- cart + checkout
 - upload slip
 - order history
-- purchased courses dashboard
+- my courses
 - lesson viewer
-- quiz submission
-- progress tracking
+- quiz + progress
+- rating / review
+- webboard ต่อคอร์สและต่อบทเรียน
+- course chatbot
 
 ### Admin
 
 - dashboard stats
 - course CRUD
 - lesson CRUD
-- order approve / reject
-- enrollment auto-create หลัง approve
+- อัปโหลดไฟล์วิดีโอจริงสำหรับบทเรียน
+- approve / reject orders
+- auto-create enrollment หลัง approve
 
 ## Tech Stack
 
-- Next.js 16 (App Router)
+- Next.js 16 App Router
 - React 19
 - Tailwind CSS v4
-- Prisma 7 + `@prisma/adapter-pg`
-- PostgreSQL
+- Prisma 7 + PostgreSQL
 - NextAuth v4
+- Vercel Blob
 - Playwright
 
-## App Location
+## Source of Truth
 
-repo นี้คือ application source หลักอยู่ที่ root ของโฟลเดอร์ `lms/`
+application source จริงอยู่ที่ root ของ repo นี้ (`lms/`)
 
 เอกสารสำคัญ:
 
@@ -74,7 +70,7 @@ repo นี้คือ application source หลักอยู่ที่ roo
 npm install
 ```
 
-2. สร้าง env จากตัวอย่าง
+2. สร้างไฟล์ env
 
 ```bash
 cp .env.example .env.local
@@ -88,7 +84,7 @@ cp .env.example .env.local
 - `NEXTAUTH_URL`
 - `BLOB_READ_WRITE_TOKEN` ถ้าต้องการทดสอบ Vercel Blob จากเครื่อง local
 
-4. push schema และ seed ข้อมูล
+4. sync schema และ seed
 
 ```bash
 npx prisma db push
@@ -101,7 +97,7 @@ npx tsx prisma/seed.ts
 npm run dev -- --port 3000 --webpack
 ```
 
-หรือใช้สคริปต์ที่เตรียมไว้จาก workspace root:
+หรือใช้สคริปต์จาก workspace root:
 
 ```powershell
 ..\start-lms-dev.cmd 3000
@@ -121,54 +117,39 @@ npm run build
 npm run test:e2e
 ```
 
-## Notes เรื่องข้อมูลอัปโหลด
+## Upload / Storage Notes
 
-ระบบรองรับ 2 โหมด:
+### Slip upload
 
-- ถ้ามี `BLOB_READ_WRITE_TOKEN` จะอัปโหลด slip ไปที่ Vercel Blob
-- ถ้ายังไม่มี token ระบบจะ fallback ไปเก็บใน `public/uploads/` สำหรับ local development และ e2e tests
+- ถ้ามี `BLOB_READ_WRITE_TOKEN` ระบบจะเก็บ slip ที่ Vercel Blob
+- ถ้าไม่มี token ระบบจะ fallback ไปที่ `public/uploads/`
+- slip ยังใช้แนวทาง server upload จึงควรคุมไฟล์ไม่เกิน `4.5MB`
 
-ข้อจำกัดปัจจุบันของ server upload บน Vercel คือควรใช้ไฟล์ไม่เกิน `4.5MB` ดังนั้น validation ของ slip จะอิงขีดจำกัดนี้
+### Video lesson upload
 
-## Push ขึ้น GitHub
+- ถ้ามี `BLOB_READ_WRITE_TOKEN` ฟอร์มบทเรียนจะอัปโหลดวิดีโอจาก browser ไป Vercel Blob โดยตรง
+- ถ้าไม่มี token ระบบจะ fallback ไปที่ `public/uploads/videos/`
+- repo มีไฟล์ fixture สำหรับทดสอบอยู่ที่ `tests/fixtures/videos/`
 
-ตัวอย่างขั้นตอน:
+## GitHub
+
+ตัวอย่างคำสั่ง push:
 
 ```bash
 cd C:\AI\LMS\lms
 git status
 git add .
-git commit -m "Prepare LearnHub LMS MVP for GitHub and Vercel"
-git branch -M main
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
+git commit -m "Add admin video upload flow"
+git push
 ```
 
-ถ้า GitHub repo ถูกสร้างไว้แล้วแต่มี remote เดิมผิด:
+## Vercel
 
-```bash
-git remote remove origin
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
-```
+ค่าที่ต้องมีอย่างน้อย:
 
-## Prepare for Vercel
-
-### Required
-
-- production PostgreSQL database
-- `DATABASE_URL` สำหรับ production
+- `DATABASE_URL`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `BLOB_READ_WRITE_TOKEN`
 
-### Recommended Flow
-
-1. push repo นี้ขึ้น GitHub ให้เรียบร้อย
-2. import repo เข้า Vercel
-3. ตั้ง Environment Variables
-4. สร้าง Blob store แล้วผูก `BLOB_READ_WRITE_TOKEN`
-5. deploy
-6. run smoke test หลัง deploy
-
-รายละเอียด checklist อยู่ที่ [Deployment Notes](./docs/DEPLOYMENT.md)
+รายละเอียด deployment checklist อยู่ที่ [Deployment Notes](./docs/DEPLOYMENT.md)
