@@ -14,12 +14,12 @@
 }
 
 body {
-  background: #f8f9fa;
-  color: #1a1a2e;
+  background: #fefaf9;
+  color: #1a1213;
   font-family: var(--font-geist-sans), "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Star rating */
-.star-filled { color: #f59e0b; }
+.star-filled { color: #e11d48; }
 .star-empty  { color: #d1d5db; }

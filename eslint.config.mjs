@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     ".artifacts/**",
     "playwright-report/**",
     "test-results/**",
+    "design_handoff_lms/**",
   ]),
 ]);
 

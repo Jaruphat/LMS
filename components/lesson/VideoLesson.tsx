@@ -1,11 +1,4 @@
-function extractYouTubeId(url: string): string | null {
-  const match = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/)
-  return match?.[1] ?? null
-}
-
-function isDirectVideoFile(url: string) {
-  return /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(url)
-}
+import { extractYouTubeId, isDirectVideoFile } from "@/lib/video"
 
 export function VideoLesson({ url }: { url: string }) {
   const videoId = extractYouTubeId(url)

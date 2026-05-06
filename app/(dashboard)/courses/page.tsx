@@ -1,88 +1,80 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Bot, Database, FileSearch, MessageSquare, Workflow } from "lucide-react"
+import { ArrowRight, Bot, FileSearch, Layers3, MessageSquare, PlayCircle, Workflow } from "lucide-react"
 import { CourseCard } from "@/components/course/CourseCard"
 import { getPublicCourses } from "@/lib/data"
+import { formatPrice } from "@/lib/format"
 
 const TOPICS = [
   "ระบบงานอัตโนมัติด้วย n8n",
-  "Automation จาก Google Sheets",
+  "Google Sheets + AI Workflow",
   "OCR ภาษาไทย",
-  "ผู้ช่วยอัจฉริยะบน LINE",
-  "งานคอนเทนต์ด้วย AI",
+  "Q&A ระหว่างผู้สอนกับผู้เรียน",
+  "การเรียนแบบ preview ก่อนตัดสินใจ",
 ]
 
 const TRACKS = [
   {
-    title: "ระบบอัตโนมัติที่นำไปใช้ได้จริง",
-    description: "ออกแบบตั้งแต่ trigger, orchestration, retry, approval ไปจนถึงการส่งมอบงานให้ทีมใช้งานต่อได้จริง",
+    title: "Automation ที่ใช้กับงานจริง",
+    description: "เรียนรู้ตั้งแต่การวาง trigger ไปจนถึงการส่งมอบ workflow ให้ทีมใช้งานต่อได้จริงในองค์กร",
     icon: Workflow,
   },
   {
-    title: "OCR และข้อมูลแบบมีโครงสร้าง",
-    description: "เปลี่ยนเอกสารไทย สลิป และฟอร์ม ให้กลายเป็นข้อมูลที่ตรวจสอบย้อนกลับและ validate ได้",
+    title: "แปลงข้อมูลยุ่งยากให้พร้อมใช้งาน",
+    description: "ต่อยอดงาน OCR, เอกสาร, สลิป และข้อมูลกึ่งโครงสร้างให้กลายเป็น flow ที่ตรวจสอบย้อนหลังได้",
     icon: FileSearch,
   },
   {
-    title: "AI สำหรับงานปฏิบัติการ",
-    description: "ทำให้ agent และ content workflow ทำงานบนข้อมูลจริง กฎการ routing และสถานะที่ชัดเจน",
+    title: "เรียนจากโจทย์ที่ใกล้กับ production",
+    description: "ทั้งคอร์สฟรี คอร์สเสียเงิน preview บทเรียน และ approval flow ถูกต่อเข้าระบบเดียวกันครบแล้ว",
     icon: Bot,
   },
 ]
 
 const FEATURES = [
   {
-    title: "แค็ตตาล็อกคอร์สจากโจทย์ใช้งานจริง",
-    description: "ชุดคอร์สเดโมนี้ออกแบบจากธีม automation สาธารณะที่เชื่อมโยงกับช่องอ้างอิง เพื่อให้เริ่มทดลองระบบได้ทันที",
-    icon: MessageSquare,
+    title: "หน้าคอร์สแบบดูภาพรวมได้เร็ว",
+    description: "จัดวางคอร์สเป็น editorial catalog ที่เปิดดูจำนวนบทเรียน ราคา และความเข้มข้นของคอร์สได้ในสายตาเดียว",
+    icon: Layers3,
   },
   {
-    title: "สิทธิ์เรียนแบบตรวจสอบได้",
-    description: "รองรับ cart, checkout, อัปโหลดสลิป, รีวิวโดยแอดมิน และสร้างสิทธิ์เรียนอัตโนมัติหลังอนุมัติ",
-    icon: Database,
+    title: "Preview วิดีโอก่อนซื้อ",
+    description: "คอร์สที่มีวิดีโอสามารถโชว์ preview card ของแต่ละบทได้ชัดกว่าเดิม ไม่ต้องเดาจากไอคอนเล็ก ๆ",
+    icon: PlayCircle,
+  },
+  {
+    title: "ถามตอบกับผู้สอนได้ในคอร์ส",
+    description: "มี webboard/Q&A ต่อกับสิทธิ์คอร์สโดยตรง เหมาะกับการถามปัญหาและตามคำตอบจากผู้สอน",
+    icon: MessageSquare,
   },
 ]
 
 export default async function CoursesPage() {
   const courses = await getPublicCourses()
   const totalLessons = courses.reduce((sum, course) => sum + course._count.lessons, 0)
+  const featuredCourse = courses[0]
 
   return (
-    <div className="-mt-8 space-y-10 pb-8">
-      <section className="relative overflow-hidden bg-slate-950">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/generated/hero-automation-banner.png"
-            alt="ภาพแบนเนอร์คอร์สระบบอัตโนมัติ"
-            fill
-            priority
-            className="object-cover object-center"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.92),rgba(2,6,23,0.76)_40%,rgba(2,6,23,0.4)_72%,rgba(2,6,23,0.18))]" />
-        </div>
-
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-16 md:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-          <div className="max-w-3xl space-y-6">
-            <span className="inline-flex rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
-              แค็ตตาล็อกคอร์สสายอัตโนมัติ
-            </span>
+    <div className="-mt-8 bg-[#fdf7f4] pb-12">
+      <section className="mx-auto max-w-7xl px-4 pt-10">
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div className="space-y-6">
             <div className="space-y-4">
-              <h1 className="text-4xl font-black leading-tight text-white md:text-6xl">
-                เรียนรู้ workflow เบื้องหลัง AI Ops, OCR Pipeline และระบบ Automation ที่ต่อยอดใช้งานได้จริง
+              <span className="inline-flex rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-rose-700">
+                Editorial Catalog
+              </span>
+              <h1 className="max-w-4xl text-4xl font-black leading-tight text-slate-950 md:text-6xl">
+                แค็ตตาล็อกคอร์สสาย AI และ Automation ที่ออกแบบให้ดูภาพรวมแล้วตัดสินใจเรียนต่อได้ง่ายขึ้น
               </h1>
-              <p className="max-w-2xl text-base leading-8 text-slate-200 md:text-lg">
-                หน้านี้ออกแบบสำหรับคนทำงานที่อยากเปลี่ยนจากการใช้เครื่องมือแบบกระจัดกระจาย ไปสู่ระบบที่ชัดเจนสำหรับ
-                Google Sheets, n8n orchestration, ผู้ช่วยสไตล์ LINE, การดึงข้อมูลจากเอกสาร และงานคอนเทนต์ด้วย AI
+              <p className="max-w-3xl text-base leading-8 text-slate-600 md:text-lg">
+                หน้านี้ถูกปรับใหม่ตาม design handoff ให้มี mood แบบ warm editorial มากขึ้น เน้นการอ่านคอร์สเป็นชุดความสามารถ
+                ไม่ใช่แค่รายการสินค้า และยังเชื่อมกับระบบ preview, order, approval และ webboard ที่ใช้งานได้จริงอยู่เดิม
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               {TOPICS.map((topic) => (
-                <span
-                  key={topic}
-                  className="rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur-sm"
-                >
+                <span key={topic} className="rounded-full border border-rose-100 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
                   {topic}
                 </span>
               ))}
@@ -91,78 +83,104 @@ export default async function CoursesPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="#catalog"
-                className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-amber-300"
+                className="inline-flex items-center gap-2 rounded-2xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-500"
               >
                 ดูคอร์สทั้งหมด
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-2xl border border-rose-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
               >
-                แนวคิดของแค็ตตาล็อกนี้
+                อ่านแนวคิดของแพลตฟอร์ม
               </Link>
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:self-stretch">
-            <div className="rounded-[28px] border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.18em] text-amber-200">คอร์สที่เปิดขายแล้ว</p>
-              <p className="mt-3 text-4xl font-black text-white">{courses.length}</p>
-              <p className="mt-2 text-sm leading-7 text-slate-200">ชุดคอร์สเริ่มต้นที่คัดมาจากธีม automation ที่ใช้ได้จริง</p>
+          <div className="rounded-[36px] border border-rose-100 bg-white p-4 shadow-[0_30px_80px_-55px_rgba(17,24,39,0.35)]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-[#f7ece9]">
+              <Image
+                src="/images/generated/hero-automation-banner.png"
+                alt="ภาพแบนเนอร์คอร์สระบบอัตโนมัติ"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 42vw"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0)_22%,rgba(15,23,42,0.62)_100%)]" />
+              <div className="absolute inset-x-5 bottom-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-3xl border border-white/20 bg-white/14 px-4 py-4 backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/70">คอร์สที่ publish แล้ว</p>
+                  <p className="mt-2 text-3xl font-black text-white">{courses.length}</p>
+                </div>
+                <div className="rounded-3xl border border-white/20 bg-white/14 px-4 py-4 backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.16em] text-white/70">จำนวนบทเรียน</p>
+                  <p className="mt-2 text-3xl font-black text-white">{totalLessons}</p>
+                </div>
+              </div>
             </div>
-            <div className="rounded-[28px] border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.18em] text-amber-200">จำนวนบทเรียน</p>
-              <p className="mt-3 text-4xl font-black text-white">{totalLessons}</p>
-              <p className="mt-2 text-sm leading-7 text-slate-200">มีทั้งบทเรียน preview และเนื้อหาที่ปลดล็อกหลังอนุมัติคำสั่งซื้อ</p>
-            </div>
+
+            {featuredCourse ? (
+              <div className="mt-4 rounded-[28px] border border-rose-100 bg-[#fff8f6] p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-700">Featured Course</p>
+                    <h2 className="mt-2 text-xl font-black text-slate-950">{featuredCourse.title}</h2>
+                  </div>
+                  <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold text-white">
+                    {featuredCourse.price === 0 ? "เรียนฟรี" : formatPrice(featuredCourse.price)}
+                  </span>
+                </div>
+                <p className="mt-3 line-clamp-3 text-sm leading-7 text-slate-600">{featuredCourse.description}</p>
+                <Link
+                  href={`/courses/${featuredCourse.id}`}
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-rose-700 transition hover:text-rose-600"
+                >
+                  เปิดหน้าหลักสูตรนี้
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[1.02fr_0.98fr]">
-        <div className="space-y-5 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
-          <div className="space-y-3">
-            <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">
-              เส้นทางการเรียนรู้
-            </span>
-            <h2 className="text-3xl font-black text-slate-950">แค็ตตาล็อกที่ออกแบบเหมือน skill stack ของคนทำระบบยุคใหม่</h2>
-            <p className="text-base leading-8 text-slate-600">
-              แทนที่จะใช้หมวดกว้าง ๆ แบบทั่วไป หน้านี้โฟกัสที่ระบบคิดเชิงงานจริง แต่ละ track ผูกกับรูปแบบงานที่ทีมต้อง
-              automate, review และนำไปรันใน production ได้จริง
-            </p>
+      <section className="mx-auto mt-10 max-w-7xl px-4">
+        <div className="grid gap-4 lg:grid-cols-3">
+          {TRACKS.map(({ title, description, icon: Icon }) => (
+            <article key={title} className="rounded-[28px] border border-rose-100 bg-white p-6 shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+                <Icon className="h-5 w-5" />
+              </div>
+              <h2 className="mt-5 text-xl font-black text-slate-950">{title}</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-7xl px-4">
+        <div className="rounded-[36px] border border-rose-100 bg-white p-6 shadow-sm lg:p-8">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <span className="inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+                สิ่งที่ปรับจากดีไซน์ใหม่
+              </span>
+              <h2 className="mt-3 text-3xl font-black text-slate-950">โครงหน้าคอร์สใหม่ยังยึด flow จริงของระบบเดิม</h2>
+              <p className="mt-3 max-w-3xl text-base leading-8 text-slate-600">
+                แม้หน้าตาจะ editorial มากขึ้น แต่ทุกคอร์สยังเชื่อมกับระบบสมาชิก, checkout, upload slip, อนุมัติคำสั่งซื้อ,
+                preview บทเรียน, chatbot และ Q&A ตามของจริงในโปรเจกต์นี้
+              </p>
+            </div>
           </div>
 
-          <div className="grid gap-4">
-            {TRACKS.map(({ title, description, icon: Icon }) => (
-              <article key={title} className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-amber-300">
+          <div className="grid gap-4 lg:grid-cols-3">
+            {FEATURES.map(({ title, description, icon: Icon }) => (
+              <article key={title} className="rounded-[28px] bg-[#fff8f6] p-5">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-700 shadow-sm">
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-950">{title}</h3>
-                <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-          <div className="relative aspect-[16/11]">
-            <Image
-              src="/images/generated/course-showcase-mockup.png"
-              alt="ภาพจำลองหน้าคอร์สและระบบเรียน"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 48vw"
-            />
-          </div>
-          <div className="grid gap-4 border-t border-slate-200 p-6 lg:grid-cols-2">
-            {FEATURES.map(({ title, description, icon: Icon }) => (
-              <article key={title} className="rounded-3xl bg-slate-50 p-4">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-950 shadow-sm">
-                  <Icon className="h-4 w-4" />
-                </div>
-                <h3 className="text-base font-bold text-slate-950">{title}</h3>
+                <h3 className="mt-4 text-lg font-bold text-slate-950">{title}</h3>
                 <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
               </article>
             ))}
@@ -170,21 +188,21 @@ export default async function CoursesPage() {
         </div>
       </section>
 
-      <section id="catalog" className="mx-auto max-w-7xl px-4">
+      <section id="catalog" className="mx-auto mt-10 max-w-7xl px-4">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-2">
-            <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-              รายการคอร์ส
+          <div>
+            <span className="inline-flex rounded-full border border-rose-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+              Course Catalog
             </span>
-            <h2 className="text-3xl font-black text-slate-950">{courses.length} คอร์สพร้อมใช้งานกับ flow ซื้อคอร์ส ชำระเงิน และอนุมัติคำสั่งซื้อ</h2>
-            <p className="max-w-3xl text-base leading-8 text-slate-600">
-              คอร์สทั้งหมดถูก publish และเชื่อมเข้ากับ commerce flow ปัจจุบันแล้ว ทั้ง cart, checkout, อัปโหลดสลิป,
-              การอนุมัติโดยแอดมิน และการสร้างสิทธิ์เรียนหลังอนุมัติ
+            <h2 className="mt-3 text-3xl font-black text-slate-950">{courses.length} หลักสูตรที่เปิดดูและซื้อเรียนต่อได้แล้ว</h2>
+            <p className="mt-3 max-w-3xl text-base leading-8 text-slate-600">
+              ใช้หน้ารายการนี้เพื่อสำรวจภาพรวม แล้วเข้าไปดู detail ของแต่ละคอร์สเพื่อดู video preview, curriculum, rating และ
+              ถามตอบกับผู้สอนในแต่ละหลักสูตร
             </p>
           </div>
-          <p className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
-            เปิดใช้งานแล้ว {courses.length} คอร์ส
-          </p>
+          <div className="rounded-full border border-rose-100 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+            พร้อมใช้งาน {courses.length} คอร์ส
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">

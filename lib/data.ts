@@ -325,6 +325,7 @@ export async function getCourseDiscussionThreads(courseId: string, lessonId?: st
           id: true,
           email: true,
           name: true,
+          role: true,
         },
       },
       replies: {
@@ -335,6 +336,7 @@ export async function getCourseDiscussionThreads(courseId: string, lessonId?: st
               id: true,
               email: true,
               name: true,
+              role: true,
             },
           },
         },

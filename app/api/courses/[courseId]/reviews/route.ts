@@ -69,15 +69,6 @@ export async function POST(
       return NextResponse.json({ error: "ข้อมูลรีวิวไม่ถูกต้อง" }, { status: 400 })
     }
 
-    const course = await db.course.findFirst({
-      where: { id: courseId, status: "PUBLISHED" },
-      select: { id: true },
-    })
-
-    if (!course) {
-      return NextResponse.json({ error: "ไม่พบคอร์สที่ต้องการรีวิว" }, { status: 404 })
-    }
-
     const review = await db.courseReview.upsert({
       where: {
         courseId_userId: {

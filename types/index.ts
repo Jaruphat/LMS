@@ -92,7 +92,7 @@ export interface DiscussionThread {
   isPinned: boolean
   createdAt: Date
   updatedAt: Date
-  user?: Pick<User, "id" | "email" | "name">
+  user?: Pick<User, "id" | "email" | "name" | "role">
   replies?: DiscussionReply[]
 }
 
@@ -103,7 +103,7 @@ export interface DiscussionReply {
   content: string
   createdAt: Date
   updatedAt: Date
-  user?: Pick<User, "id" | "email" | "name">
+  user?: Pick<User, "id" | "email" | "name" | "role">
 }
 
 export interface CourseChatMessage {

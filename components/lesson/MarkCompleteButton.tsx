@@ -30,14 +30,14 @@ export function MarkCompleteButton({ lessonId, completed }: Props) {
     <button
       onClick={handleClick}
       disabled={done || loading}
-      className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+      className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
         done
-          ? "bg-green-50 text-green-700 border border-green-200 cursor-default"
-          : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
+          ? "cursor-default border border-emerald-200 bg-emerald-50 text-emerald-700"
+          : "bg-rose-600 text-white shadow-sm hover:bg-rose-500"
       } disabled:opacity-70`}
     >
       <CheckCircle className="w-4 h-4" />
-      {done ? "Completed" : loading ? "Saving…" : "Mark as Complete"}
+      {done ? "เรียนจบบทนี้แล้ว" : loading ? "กำลังบันทึก..." : "ทำเครื่องหมายว่าเรียนจบ"}
     </button>
   )
 }

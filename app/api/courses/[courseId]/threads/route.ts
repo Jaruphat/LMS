@@ -29,6 +29,7 @@ export async function GET(
           id: true,
           email: true,
           name: true,
+          role: true,
         },
       },
       replies: {
@@ -39,6 +40,7 @@ export async function GET(
               id: true,
               email: true,
               name: true,
+              role: true,
             },
           },
         },
@@ -95,6 +97,7 @@ export async function POST(
             id: true,
             email: true,
             name: true,
+            role: true,
           },
         },
         replies: {
@@ -105,6 +108,7 @@ export async function POST(
                 id: true,
                 email: true,
                 name: true,
+                role: true,
               },
             },
           },
