@@ -49,10 +49,10 @@ export function DeleteButton({
         type="button"
         onClick={handleDelete}
         disabled={isPending}
-        className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+        className={`rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
           variant === "danger"
-            ? "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
-            : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            ? "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+            : "border border-rose-100 bg-white text-slate-700 hover:bg-[#fff8f6]"
         }`}
       >
         {isPending ? "กำลังลบ..." : label}

@@ -48,7 +48,7 @@ export function AdminOrderActions({ orderId, status }: Props) {
           type="button"
           onClick={() => submit("approve")}
           disabled={isPending}
-          className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="rounded-full bg-slate-950 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
         >
           อนุมัติ
         </button>
@@ -57,7 +57,7 @@ export function AdminOrderActions({ orderId, status }: Props) {
           type="button"
           onClick={() => submit("reject")}
           disabled={isPending}
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-60"
+          className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:opacity-60"
         >
           ปฏิเสธ
         </button>

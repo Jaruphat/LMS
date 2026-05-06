@@ -23,16 +23,37 @@ export default async function DashboardOrdersPage() {
     },
   })
 
+  const approvedCount = orders.filter((order) => order.status === "APPROVED").length
+  const pendingCount = orders.filter((order) => order.status === "PENDING").length
+
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="mb-6 rounded-3xl border border-slate-200 bg-white p-6">
-        <h1 className="text-2xl font-bold text-slate-900">ประวัติคำสั่งซื้อ</h1>
-        <p className="mt-2 text-sm text-slate-500">เช็กสถานะ pending, approved, rejected และรายการคอร์สในแต่ละ order</p>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <section className="rounded-[36px] border border-rose-100 bg-[linear-gradient(180deg,#fffdfc_0%,#fff8f6_100%)] p-6 shadow-[0_24px_70px_-50px_rgba(159,18,57,0.45)] lg:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-rose-700">Order History</p>
+            <h1 className="mt-3 text-3xl font-black text-slate-950 md:text-4xl">ประวัติคำสั่งซื้อและสถานะการอนุมัติ</h1>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              เช็กได้ว่าคำสั่งซื้อไหนยังรออนุมัติ, อนุมัติแล้ว หรือถูกปฏิเสธ พร้อมดูรายละเอียดคอร์สในแต่ละรายการจากหน้าจอเดียว
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-[28px] border border-rose-100 bg-white px-5 py-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">อนุมัติแล้ว</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{approvedCount}</p>
+            </div>
+            <div className="rounded-[28px] border border-rose-100 bg-white px-5 py-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">รอตรวจสอบ</p>
+              <p className="mt-2 text-3xl font-black text-slate-950">{pendingCount}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="space-y-4">
         {orders.map((order) => (
-          <div key={order.id} data-testid="student-order-card" className="rounded-3xl border border-slate-200 bg-white p-5">
+          <div key={order.id} data-testid="student-order-card" className="rounded-[32px] border border-rose-100 bg-white p-5 shadow-sm">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-semibold text-slate-900">คำสั่งซื้อ #{order.id.slice(-8)}</p>
@@ -40,15 +61,15 @@ export default async function DashboardOrdersPage() {
               </div>
               <div className="text-right">
                 <OrderStatusBadge status={order.status} />
-                <p className="mt-2 text-sm font-semibold text-slate-900">{formatPrice(order.totalAmount)}</p>
+                <p className="mt-2 text-base font-bold text-slate-900">{formatPrice(order.totalAmount)}</p>
               </div>
             </div>
 
             <div className="space-y-2">
               {order.items.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
+                <div key={item.id} className="flex items-center justify-between rounded-[24px] border border-rose-100 bg-[#fff8f6] px-4 py-3 text-sm">
                   <span className="text-slate-700">{item.course.title}</span>
-                  <span className="font-medium text-slate-900">{formatPrice(item.price)}</span>
+                  <span className="font-semibold text-slate-900">{formatPrice(item.price)}</span>
                 </div>
               ))}
             </div>
@@ -56,7 +77,7 @@ export default async function DashboardOrdersPage() {
         ))}
 
         {orders.length === 0 && (
-          <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-8 py-12 text-center text-slate-500">
+          <div className="rounded-[32px] border border-dashed border-rose-200 bg-white px-8 py-12 text-center text-slate-500">
             ยังไม่มีคำสั่งซื้อ
           </div>
         )}

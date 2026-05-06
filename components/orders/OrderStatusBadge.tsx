@@ -16,7 +16,7 @@ const STATUS_LABELS: Record<Props["status"], string> = {
 
 export function OrderStatusBadge({ status }: Props) {
   return (
-    <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[status]}`}>
+    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.02em] ${STATUS_STYLES[status]}`}>
       {STATUS_LABELS[status]}
     </span>
   )

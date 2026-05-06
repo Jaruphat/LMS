@@ -15,12 +15,12 @@ function StatsCard({
   icon: ComponentType<{ className?: string }>
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+    <div className="rounded-[28px] border border-rose-100 bg-white p-5 shadow-sm">
+      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff1ec] text-rose-700">
         <Icon className="h-5 w-5" />
       </div>
       <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
+      <p className="mt-1 text-3xl font-black text-slate-950">{value}</p>
     </div>
   )
 }
@@ -30,10 +30,25 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div className="rounded-3xl border border-slate-200 bg-white p-6">
-        <h1 className="text-2xl font-bold text-slate-900">แดชบอร์ดผู้ดูแลระบบ</h1>
-        <p className="mt-2 text-sm text-slate-500">ดูภาพรวมคอร์ส ผู้ใช้ คำสั่งซื้อที่รออนุมัติ และรายได้จากคำสั่งซื้อที่อนุมัติแล้ว</p>
-      </div>
+      <section className="rounded-[36px] border border-rose-100 bg-[linear-gradient(180deg,#fffdfc_0%,#fff8f6_100%)] p-6 shadow-[0_24px_70px_-50px_rgba(159,18,57,0.45)] lg:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-rose-700">Admin Dashboard</p>
+            <h1 className="mt-3 text-3xl font-black text-slate-950 md:text-4xl">ภาพรวมของคอร์ส ผู้ใช้ คำสั่งซื้อ และรายได้</h1>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              ใช้หน้านี้เพื่อตรวจสุขภาพของระบบแบบเร็ว ๆ แล้วต่อไปยังหน้าสร้างคอร์ส, จัดการบทเรียน และอนุมัติคำสั่งซื้อได้ทันที
+            </p>
+          </div>
+
+          <Link
+            href="/admin/courses/new"
+            className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            <PlusCircle className="h-4 w-4" />
+            สร้างคอร์สใหม่
+          </Link>
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard label="จำนวนคอร์ส" value={stats.courseCount} icon={BookOpen} />
@@ -42,55 +57,46 @@ export default async function AdminDashboardPage() {
         <StatsCard label="รายได้รวม" value={formatPrice(stats.revenue)} icon={ReceiptText} />
       </div>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6">
+      <section className="rounded-[32px] border border-rose-100 bg-white p-6 shadow-sm">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">ทางลัดสำหรับผู้ดูแล</h2>
-          <p className="text-sm text-slate-500">ถ้าต้องการสร้างคอร์สหรือเพิ่มบทเรียน ให้เริ่มจากส่วนนี้ได้เลย</p>
+          <h2 className="text-xl font-black text-slate-950">ทางลัดสำหรับผู้ดูแล</h2>
+          <p className="mt-1 text-sm text-slate-500">ถ้าต้องการสร้างคอร์สหรือเพิ่มบทเรียน ให้เริ่มจากส่วนนี้ได้เลย</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <Link
-            href="/admin/courses"
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-slate-300 hover:bg-white"
-          >
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+          <Link href="/admin/courses" className="rounded-[28px] border border-rose-100 bg-[#fff8f6] p-5 transition hover:border-rose-200 hover:bg-white">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-700 shadow-sm">
               <BookOpen className="h-5 w-5" />
             </div>
-            <p className="text-base font-semibold text-slate-900">จัดการคอร์ส</p>
+            <p className="text-base font-bold text-slate-900">จัดการคอร์ส</p>
             <p className="mt-2 text-sm leading-7 text-slate-500">ดูคอร์สทั้งหมด แก้ไขรายละเอียด ลบคอร์ส และเข้าไปจัดการบทเรียน</p>
           </Link>
 
-          <Link
-            href="/admin/courses/new"
-            className="rounded-2xl border border-indigo-200 bg-indigo-600 p-5 text-white transition hover:bg-indigo-700"
-          >
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-white">
+          <Link href="/admin/courses/new" className="rounded-[28px] bg-slate-950 p-5 text-white transition hover:bg-slate-800">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-white">
               <PlusCircle className="h-5 w-5" />
             </div>
-            <p className="text-base font-semibold">สร้างคอร์สใหม่</p>
-            <p className="mt-2 text-sm leading-7 text-indigo-100">สร้างชื่อคอร์ส ราคา ภาพปก สถานะ และบันทึกคอร์สเพื่อไปเพิ่มบทเรียนต่อ</p>
+            <p className="text-base font-bold">สร้างคอร์สใหม่</p>
+            <p className="mt-2 text-sm leading-7 text-white/75">สร้างชื่อคอร์ส ราคา ภาพปก สถานะ และบันทึกคอร์สเพื่อไปเพิ่มบทเรียนต่อ</p>
           </Link>
 
-          <Link
-            href="/admin/orders"
-            className="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-slate-300 hover:bg-white"
-          >
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+          <Link href="/admin/orders" className="rounded-[28px] border border-rose-100 bg-[#fff8f6] p-5 transition hover:border-rose-200 hover:bg-white">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-700 shadow-sm">
               <ReceiptText className="h-5 w-5" />
             </div>
-            <p className="text-base font-semibold text-slate-900">ตรวจคำสั่งซื้อ</p>
+            <p className="text-base font-bold text-slate-900">ตรวจคำสั่งซื้อ</p>
             <p className="mt-2 text-sm leading-7 text-slate-500">เปิดสลิป อนุมัติคำสั่งซื้อ และสร้างสิทธิ์เรียนให้ผู้ใช้โดยอัตโนมัติ</p>
           </Link>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6">
+      <section className="rounded-[32px] border border-rose-100 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">คำสั่งซื้อล่าสุด</h2>
-            <p className="text-sm text-slate-500">คำสั่งซื้อล่าสุดและสถานะปัจจุบัน</p>
+            <h2 className="text-xl font-black text-slate-950">คำสั่งซื้อล่าสุด</h2>
+            <p className="mt-1 text-sm text-slate-500">ดูสถานะล่าสุดและติดตามคำสั่งซื้อที่ต้องเข้าไปจัดการต่อ</p>
           </div>
-          <Link href="/admin/orders" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+          <Link href="/admin/orders" className="inline-flex items-center gap-1 text-sm font-semibold text-rose-700 transition hover:text-rose-600">
             ดูทั้งหมด
             <ArrowRight className="h-4 w-4" />
           </Link>
@@ -98,10 +104,10 @@ export default async function AdminDashboardPage() {
 
         <div className="space-y-3">
           {recentOrders.map((order) => (
-            <div key={order.id} className="rounded-2xl border border-slate-100 p-4">
+            <div key={order.id} className="rounded-[24px] border border-rose-100 bg-[#fffdfc] p-4">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-medium text-slate-900">{order.user.email}</p>
+                  <p className="font-semibold text-slate-900">{order.user.email}</p>
                   <p className="text-xs text-slate-500">{formatDateTime(order.createdAt)}</p>
                 </div>
                 <OrderStatusBadge status={order.status} />
