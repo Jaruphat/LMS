@@ -1,6 +1,7 @@
 "use client"
 
 import { upload } from "@vercel/blob/client"
+import { Clapperboard, FileText, LayoutTemplate, Sparkles, UploadCloud } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { extractApiError, readApiPayload } from "@/lib/readApiPayload"
@@ -206,90 +207,136 @@ export function LessonForm({ courseId, lessonId, mode, videoUploadMode, initialV
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-5"
+      className="space-y-6"
       data-testid="lesson-form"
       data-client-ready={clientReady ? "true" : "false"}
     >
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">ชื่อบทเรียน</label>
-        <input
-          data-testid="lesson-title-input"
-          type="text"
-          required
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">สรุปเนื้อหาสั้น ๆ</label>
-        <textarea
-          data-testid="lesson-summary-input"
-          rows={3}
-          value={summary}
-          onChange={(event) => setSummary(event.target.value)}
-          placeholder="ใช้สรุปใจความของบทเรียนเพื่อแสดงบนหน้าคอร์สและช่วยตอบใน chatbot"
-          className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">ประเภท</label>
-          <select
-            data-testid="lesson-content-type-input"
-            value={contentType}
-            onChange={(event) => setContentType(event.target.value as "TEXT" | "VIDEO")}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            <option value="TEXT">บทความ (Markdown)</option>
-            <option value="VIDEO">วิดีโอ</option>
-          </select>
+      <section className="rounded-[2rem] border border-stone-200 bg-[#fffdf9] p-6 shadow-[0_24px_60px_-46px_rgba(41,37,36,0.35)]">
+        <div className="mb-5 flex items-start gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-white">
+            <LayoutTemplate className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-400">Lesson Setup</p>
+            <h2 className="mt-2 font-serif text-2xl text-stone-900">ข้อมูลพื้นฐานของบทเรียน</h2>
+            <p className="mt-2 text-sm leading-7 text-stone-600">
+              เติมชื่อ สรุป และลำดับการเรียนให้ครบเพื่อให้หน้า course detail และ lesson player แสดงผลได้อย่างเป็นระบบ
+            </p>
+          </div>
         </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">ลำดับ</label>
+
+        <div className="space-y-5">
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-stone-800">ชื่อบทเรียน</label>
+            <input
+              data-testid="lesson-title-input"
+              type="text"
+              required
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              className="w-full rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-stone-800">สรุปเนื้อหาสั้น ๆ</label>
+            <textarea
+              data-testid="lesson-summary-input"
+              rows={4}
+              value={summary}
+              onChange={(event) => setSummary(event.target.value)}
+              placeholder="สรุปใจความของบทเรียนเพื่อแสดงบนหน้าคอร์สและใช้เป็น context ให้ chatbot"
+              className="w-full resize-none rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 text-sm leading-7 text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-stone-200 bg-white/95 p-6 shadow-[0_24px_60px_-46px_rgba(41,37,36,0.28)]">
+        <div className="mb-5 flex items-start gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-400">Display Rules</p>
+            <h2 className="mt-2 font-serif text-2xl text-stone-900">รูปแบบและสิทธิ์การมองเห็น</h2>
+            <p className="mt-2 text-sm leading-7 text-stone-600">
+              เลือกว่าบทเรียนนี้เป็นข้อความหรือวิดีโอ กำหนดลำดับ และตัดสินใจว่าจะเปิดเป็น preview ให้ผู้ที่ยังไม่ซื้อคอร์สดูได้หรือไม่
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-stone-800">ประเภท</label>
+            <select
+              data-testid="lesson-content-type-input"
+              value={contentType}
+              onChange={(event) => setContentType(event.target.value as "TEXT" | "VIDEO")}
+              className="w-full rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
+            >
+              <option value="TEXT">บทความ (Markdown)</option>
+              <option value="VIDEO">วิดีโอ</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-stone-800">ลำดับ</label>
+            <input
+              data-testid="lesson-order-input"
+              type="number"
+              min={0}
+              value={order}
+              onChange={(event) => setOrder(Number(event.target.value) || 0)}
+              className="w-full rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
+            />
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <label className="mb-2 block text-sm font-semibold text-stone-800">
+            ความยาวบทเรียน {contentType === "VIDEO" ? "(เช่น 12:45 หรือ 1 ชม. 20 นาที)" : "(ถ้ามี)"}
+          </label>
           <input
-            data-testid="lesson-order-input"
-            type="number"
-            min={0}
-            value={order}
-            onChange={(event) => setOrder(Number(event.target.value) || 0)}
-            className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            data-testid="lesson-duration-input"
+            type="text"
+            value={durationText}
+            onChange={(event) => setDurationText(event.target.value)}
+            placeholder={contentType === "VIDEO" ? "ตัวอย่าง 15:32" : "ตัวอย่าง ใช้เวลาอ่าน 8 นาที"}
+            className="w-full rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
           />
         </div>
-      </div>
 
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-slate-700">
-          ความยาวบทเรียน {contentType === "VIDEO" ? "(เช่น 12:45 หรือ 1 ชม. 20 นาที)" : "(ถ้ามี)"}
+        <label className="mt-5 flex items-center gap-3 rounded-[1.5rem] border border-stone-200 bg-[#fffaf5] px-4 py-4 text-sm text-stone-700">
+          <input
+            data-testid="lesson-preview-toggle"
+            type="checkbox"
+            checked={isPreview}
+            onChange={(event) => setIsPreview(event.target.checked)}
+            className="h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-500"
+          />
+          เปิดเป็น preview ให้ผู้ที่ยังไม่ซื้อคอร์สดูได้
         </label>
-        <input
-          data-testid="lesson-duration-input"
-          type="text"
-          value={durationText}
-          onChange={(event) => setDurationText(event.target.value)}
-          placeholder={contentType === "VIDEO" ? "ตัวอย่าง 15:32" : "ตัวอย่าง ใช้เวลาอ่าน 8 นาที"}
-          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-
-      <label className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700">
-        <input
-          data-testid="lesson-preview-toggle"
-          type="checkbox"
-          checked={isPreview}
-          onChange={(event) => setIsPreview(event.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-        />
-        เปิดเป็น preview ให้ยังไม่ซื้อคอร์สดูได้
-      </label>
+      </section>
 
       {contentType === "VIDEO" ? (
-        <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-          <div className="space-y-3">
+        <section className="rounded-[2rem] border border-stone-200 bg-white/95 p-6 shadow-[0_24px_60px_-46px_rgba(41,37,36,0.28)]">
+          <div className="mb-5 flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-700">
+              <Clapperboard className="h-5 w-5" />
+            </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">อัปโหลดไฟล์วิดีโอ</label>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-400">Video Content</p>
+              <h2 className="mt-2 font-serif text-2xl text-stone-900">อัปโหลดหรือแนบวิดีโอ</h2>
+              <p className="mt-2 text-sm leading-7 text-stone-600">
+                ใช้การอัปโหลดตรงไปยัง Blob สำหรับ deployment จริง หรือใส่ URL ของ YouTube และไฟล์วิดีโอโดยตรงก็ได้
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-[1.6rem] border border-stone-200 bg-[#fffaf5] p-5">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-stone-800">อัปโหลดไฟล์วิดีโอ</label>
               <input
                 key={videoInputKey}
                 data-testid="lesson-video-upload-input"
@@ -297,35 +344,35 @@ export function LessonForm({ courseId, lessonId, mode, videoUploadMode, initialV
                 accept={VIDEO_ACCEPT_ATTRIBUTE}
                 onChange={handleVideoFileChange}
                 disabled={videoUploading}
-                className="block w-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700"
+                className="block w-full rounded-[1.2rem] border border-dashed border-stone-300 bg-white px-4 py-3 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-950 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-stone-800"
               />
             </div>
 
-            <div className="space-y-1 text-xs text-slate-500">
+            <div className="mt-4 space-y-1 text-xs leading-6 text-stone-500">
               <p>{getVideoUploadDescription(videoUploadMode)}</p>
               <p>ขนาดไฟล์สูงสุดสำหรับโหมดนี้: {formatFileSize(maxVideoUploadSize)}</p>
             </div>
 
             {selectedVideoFile && (
-              <p data-testid="lesson-video-selected" className="text-sm text-slate-600">
+              <p data-testid="lesson-video-selected" className="mt-4 text-sm font-medium text-stone-700">
                 {selectedVideoFile.name} ({formatFileSize(selectedVideoFile.size)})
               </p>
             )}
 
             {(videoUploading || videoUploadProgress > 0) && (
-              <div className="space-y-2">
-                <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+              <div className="mt-4 space-y-2">
+                <div className="h-2 overflow-hidden rounded-full bg-stone-200">
                   <div
-                    className="h-full rounded-full bg-indigo-600 transition-all"
+                    className="h-full rounded-full bg-stone-900 transition-all"
                     style={{ width: `${videoUploadProgress}%` }}
                   />
                 </div>
-                <p className="text-xs text-slate-500">{videoUploadProgress}%</p>
+                <p className="text-xs text-stone-500">{videoUploadProgress}%</p>
               </div>
             )}
 
             {videoUploadStatus && (
-              <p data-testid="lesson-video-upload-status" className="text-sm text-slate-600">
+              <p data-testid="lesson-video-upload-status" className="mt-4 text-sm text-stone-600">
                 {videoUploadStatus}
               </p>
             )}
@@ -335,14 +382,15 @@ export function LessonForm({ courseId, lessonId, mode, videoUploadMode, initialV
               type="button"
               onClick={handleVideoUpload}
               disabled={!selectedVideoFile || videoUploading || !clientReady}
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
             >
+              <UploadCloud className="h-4 w-4" />
               {videoUploading ? "กำลังอัปโหลด..." : "อัปโหลดวิดีโอ"}
             </button>
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+          <div className="mt-5">
+            <label className="mb-2 block text-sm font-semibold text-stone-800">
               Video URL (YouTube หรือไฟล์ .mp4/.webm/.ogg/.mov/.m4v)
             </label>
             <input
@@ -351,34 +399,51 @@ export function LessonForm({ courseId, lessonId, mode, videoUploadMode, initialV
               required
               value={content}
               onChange={(event) => setContent(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
             />
           </div>
-        </div>
+        </section>
       ) : (
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-slate-700">เนื้อหา Markdown</label>
+        <section className="rounded-[2rem] border border-stone-200 bg-white/95 p-6 shadow-[0_24px_60px_-46px_rgba(41,37,36,0.28)]">
+          <div className="mb-5 flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-sky-700">
+              <FileText className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-400">Text Content</p>
+              <h2 className="mt-2 font-serif text-2xl text-stone-900">เนื้อหา Markdown</h2>
+              <p className="mt-2 text-sm leading-7 text-stone-600">
+                ใช้ Markdown สำหรับบทเรียนเชิงบทความ เอกสารประกอบ หรือสรุปแนวคิดสำคัญที่ผู้เรียนต้องอ่าน
+              </p>
+            </div>
+          </div>
+
           <textarea
             data-testid="lesson-content-input"
             required
-            rows={10}
+            rows={12}
             value={content}
             onChange={(event) => setContent(event.target.value)}
-            className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full resize-none rounded-[1.25rem] border border-stone-300 bg-white px-4 py-3 font-mono text-sm leading-7 text-stone-900 outline-none transition focus:border-stone-500 focus:ring-4 focus:ring-stone-900/5"
           />
-        </div>
+        </section>
       )}
 
-      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="rounded-[1.25rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
-      <button
-        data-testid="lesson-submit"
-        type="submit"
-        disabled={loading || videoUploading}
-        className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
-      >
-        {loading ? "กำลังบันทึก..." : mode === "create" ? "เพิ่มบทเรียน" : "บันทึกบทเรียน"}
-      </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="rounded-full border border-stone-200 bg-[#fffaf5] px-4 py-2 text-xs font-semibold text-stone-600">
+          บันทึกแล้วระบบจะพากลับไปยังหน้าจัดการบทเรียนของคอร์สนี้
+        </div>
+        <button
+          data-testid="lesson-submit"
+          type="submit"
+          disabled={loading || videoUploading}
+          className="inline-flex items-center justify-center rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:opacity-60"
+        >
+          {loading ? "กำลังบันทึก..." : mode === "create" ? "เพิ่มบทเรียน" : "บันทึกบทเรียน"}
+        </button>
+      </div>
     </form>
   )
 }
