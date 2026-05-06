@@ -60,7 +60,7 @@ export function AddToCartButton({ course, callbackPath, isEnrolled, hasPendingOr
         data-client-ready={clientReady ? "true" : "false"}
         type="button"
         disabled
-        className="w-full rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
+        className="w-full rounded-full border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
       >
         ลงทะเบียนแล้ว
       </button>
@@ -74,7 +74,7 @@ export function AddToCartButton({ course, callbackPath, isEnrolled, hasPendingOr
         data-client-ready={clientReady ? "true" : "false"}
         type="button"
         disabled
-        className="w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700"
+        className="w-full rounded-full border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700"
       >
         รอแอดมินตรวจสอบการชำระเงิน
       </button>
@@ -87,10 +87,10 @@ export function AddToCartButton({ course, callbackPath, isEnrolled, hasPendingOr
       data-client-ready={clientReady ? "true" : "false"}
       type="button"
       onClick={handleClick}
-      className={`w-full rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+      className={`w-full rounded-full px-4 py-3 text-sm font-medium transition-colors ${
         inCart || added
           ? "bg-slate-900 text-white hover:bg-slate-800"
-          : "bg-indigo-600 text-white hover:bg-indigo-700"
+          : "bg-rose-600 text-white hover:bg-rose-500"
       }`}
     >
       {inCart || added ? "ไปที่ตะกร้า" : "เพิ่มลงตะกร้า"}
