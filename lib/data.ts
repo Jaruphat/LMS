@@ -17,6 +17,23 @@ function withCourseStats<T extends { reviews: Array<{ rating: number }> }>(cours
   }
 }
 
+const bangkokDayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Bangkok",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+})
+
+const bangkokDayLabelFormatter = new Intl.DateTimeFormat("th-TH", {
+  timeZone: "Asia/Bangkok",
+  day: "numeric",
+  month: "short",
+})
+
+function getBangkokDayKey(value: Date) {
+  return bangkokDayKeyFormatter.format(value)
+}
+
 export async function getPublicCourses() {
   const courses = await db.course.findMany({
     where: { status: "PUBLISHED" },
@@ -259,39 +276,179 @@ export async function getStudentDashboardData(userId: string) {
 }
 
 export async function getAdminDashboardData() {
-  const [courseCount, userCount, pendingOrders, approvedOrders, recentOrders] = await Promise.all([
-    db.course.count(),
-    db.user.count(),
-    db.order.count({ where: { status: "PENDING" } }),
-    db.order.findMany({
-      where: { status: "APPROVED" },
-      select: { totalAmount: true },
-    }),
-    db.order.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: {
-        user: { select: { email: true } },
-        items: {
-          include: {
-            course: {
-              select: { title: true },
+  const now = new Date()
+  const timelineStart = new Date(now)
+  timelineStart.setDate(now.getDate() - 6)
+  timelineStart.setHours(0, 0, 0, 0)
+
+  const [courseCount, userCount, totalEnrollments, pendingOrders, approvedOrdersCount, rejectedOrdersCount, analyticsCourses, recentOrders, timelineOrders, totalLessons, videoLessons, previewLessons] =
+    await Promise.all([
+      db.course.count(),
+      db.user.count(),
+      db.enrollment.count(),
+      db.order.count({ where: { status: "PENDING" } }),
+      db.order.count({ where: { status: "APPROVED" } }),
+      db.order.count({ where: { status: "REJECTED" } }),
+      db.course.findMany({
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          status: true,
+          viewCount: true,
+          lessons: {
+            select: {
+              id: true,
+              title: true,
+              contentType: true,
+              isPreview: true,
+            },
+          },
+          reviews: { select: { rating: true } },
+          _count: { select: { enrollments: true } },
+          orderItems: {
+            select: {
+              price: true,
+              order: {
+                select: {
+                  status: true,
+                },
+              },
             },
           },
         },
-      },
-    }),
-  ])
+      }),
+      db.order.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        include: {
+          user: { select: { email: true } },
+          items: {
+            include: {
+              course: {
+                select: { title: true },
+              },
+            },
+          },
+        },
+      }),
+      db.order.findMany({
+        where: {
+          createdAt: {
+            gte: timelineStart,
+          },
+        },
+        orderBy: { createdAt: "asc" },
+        select: {
+          createdAt: true,
+          status: true,
+          totalAmount: true,
+        },
+      }),
+      db.lesson.count(),
+      db.lesson.count({ where: { contentType: "VIDEO" } }),
+      db.lesson.count({ where: { isPreview: true } }),
+    ])
 
-  const revenue = approvedOrders.reduce((sum, order) => sum + order.totalAmount, 0)
+  const textLessons = totalLessons - videoLessons
+  const publishedCourses = analyticsCourses.filter((course) => course.status === "PUBLISHED").length
+  const draftCourses = courseCount - publishedCourses
+  const freeCourses = analyticsCourses.filter((course) => course.price === 0).length
+  const paidCourses = courseCount - freeCourses
+  const totalOrders = pendingOrders + approvedOrdersCount + rejectedOrdersCount
+  const totalViews = analyticsCourses.reduce((sum, course) => sum + course.viewCount, 0)
+
+  const topCourses = analyticsCourses
+    .map((course) => {
+      const approvedRevenue = course.orderItems.reduce((sum, item) => {
+        return item.order.status === "APPROVED" ? sum + item.price : sum
+      }, 0)
+
+      const previewCount = course.lessons.filter((lesson) => lesson.isPreview).length
+      const videoCount = course.lessons.filter((lesson) => lesson.contentType === "VIDEO").length
+
+      return {
+        id: course.id,
+        title: course.title,
+        status: course.status,
+        viewCount: course.viewCount,
+        revenue: approvedRevenue,
+        enrollmentCount: course._count.enrollments,
+        lessonCount: course.lessons.length,
+        previewCount,
+        videoCount,
+        ratingAverage: averageRatingFromEntries(course.reviews),
+        ratingCount: course.reviews.length,
+      }
+    })
+    .sort((left, right) => {
+      if (right.revenue !== left.revenue) return right.revenue - left.revenue
+      if (right.enrollmentCount !== left.enrollmentCount) return right.enrollmentCount - left.enrollmentCount
+      return right.viewCount - left.viewCount
+    })
+
+  const revenue = topCourses.reduce((sum, course) => sum + course.revenue, 0)
+  const approvalRate = totalOrders === 0 ? 0 : Math.round((approvedOrdersCount / totalOrders) * 100)
+  const averageOrderValue = approvedOrdersCount === 0 ? 0 : revenue / approvedOrdersCount
+  const enrollmentRate = totalViews === 0 ? 0 : Math.round((totalEnrollments / totalViews) * 100)
+
+  const revenueTimeline = Array.from({ length: 7 }, (_, index) => {
+    const bucketDate = new Date(timelineStart)
+    bucketDate.setDate(timelineStart.getDate() + index)
+
+    return {
+      key: getBangkokDayKey(bucketDate),
+      label: bangkokDayLabelFormatter.format(bucketDate),
+      orders: 0,
+      approvedOrders: 0,
+      revenue: 0,
+    }
+  })
+
+  const timelineMap = new Map(revenueTimeline.map((bucket) => [bucket.key, bucket]))
+  for (const order of timelineOrders) {
+    const bucket = timelineMap.get(getBangkokDayKey(order.createdAt))
+    if (!bucket) continue
+
+    bucket.orders += 1
+    if (order.status === "APPROVED") {
+      bucket.approvedOrders += 1
+      bucket.revenue += order.totalAmount
+    }
+  }
 
   return {
     stats: {
       courseCount,
       userCount,
       pendingOrders,
+      approvedOrders: approvedOrdersCount,
+      rejectedOrders: rejectedOrdersCount,
       revenue,
+      totalLessons,
+      totalEnrollments,
+      totalViews,
+      publishedCourses,
+      draftCourses,
+      freeCourses,
+      paidCourses,
+      approvalRate,
+      averageOrderValue,
+      enrollmentRate,
     },
+    orderBreakdown: [
+      { status: "PENDING" as const, label: "รออนุมัติ", count: pendingOrders },
+      { status: "APPROVED" as const, label: "อนุมัติแล้ว", count: approvedOrdersCount },
+      { status: "REJECTED" as const, label: "ปฏิเสธ", count: rejectedOrdersCount },
+    ],
+    lessonComposition: {
+      total: totalLessons,
+      video: videoLessons,
+      text: textLessons,
+      preview: previewLessons,
+    },
+    revenueTimeline,
+    topCourses: topCourses.slice(0, 5),
     recentOrders,
   }
 }
@@ -440,7 +597,66 @@ export async function getCourseChatbotContext(courseId: string) {
             ...lesson,
             summary: null,
             content: lesson.title,
-          }
+      }
     ),
+  }
+}
+
+export async function getGlobalChatbotContext(activeCourseId?: string) {
+  const user = await getCurrentUser()
+  const courseWhere = user?.role === "ADMIN" ? {} : { status: "PUBLISHED" as const }
+
+  const [activeCourse, courses] = await Promise.all([
+    activeCourseId ? getCourseChatbotContext(activeCourseId) : Promise.resolve(null),
+    db.course.findMany({
+      where: courseWhere,
+      orderBy: [{ viewCount: "desc" }, { createdAt: "desc" }],
+      take: 18,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        price: true,
+        status: true,
+        viewCount: true,
+        lessons: {
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            title: true,
+            summary: true,
+            contentType: true,
+            durationText: true,
+            isPreview: true,
+          },
+        },
+        reviews: { select: { rating: true } },
+        _count: {
+          select: {
+            lessons: true,
+            enrollments: true,
+          },
+        },
+      },
+    }),
+  ])
+
+  return {
+    activeCourse,
+    courses: courses.map((course) => ({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      price: course.price,
+      status: course.status,
+      viewCount: course.viewCount,
+      lessonCount: course._count.lessons,
+      enrollmentCount: course._count.enrollments,
+      previewCount: course.lessons.filter((lesson) => lesson.isPreview).length,
+      videoCount: course.lessons.filter((lesson) => lesson.contentType === "VIDEO").length,
+      ratingAverage: averageRatingFromEntries(course.reviews),
+      ratingCount: course.reviews.length,
+      lessonTopics: course.lessons.slice(0, 5).map((lesson) => lesson.summary?.trim() || lesson.title),
+    })),
   }
 }

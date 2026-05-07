@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link"
 import {
+  Bot,
   BookOpen,
   ChevronLeft,
   Clock3,
@@ -14,7 +15,6 @@ import {
 } from "lucide-react"
 import { notFound } from "next/navigation"
 import { AddToCartButton } from "@/components/cart/AddToCartButton"
-import { CourseChatbot } from "@/components/chatbot/CourseChatbot"
 import { DiscussionBoard } from "@/components/community/DiscussionBoard"
 import { ViewTracker } from "@/components/engagement/ViewTracker"
 import { CourseRatingPanel } from "@/components/reviews/CourseRatingPanel"
@@ -421,7 +421,32 @@ export default async function CourseDetailPage({
             initialRatingCount={course.ratingCount}
             canReview={reviewAllowed}
           />
-          <CourseChatbot courseId={course.id} courseTitle={course.title} />
+
+          <section className="rounded-[32px] border border-rose-100 bg-[linear-gradient(180deg,#fffdfc_0%,#fff7f2_100%)] p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+                <Bot className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">AI Assistant</p>
+                <h2 className="mt-2 text-2xl font-black text-slate-950">ถามผู้ช่วยได้จากทุกหน้า</h2>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  ถ้าต้องการให้ช่วยสรุปคอร์สนี้ แนะนำบท preview หรือช่วยเลือกคอร์สที่เหมาะกับเป้าหมายของคุณ ให้กดไอคอนหุ่นยนต์ที่ลอยอยู่มุมขวาล่างได้เลย
+                </p>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[22px] border border-rose-100 bg-white px-4 py-4">
+                    <p className="text-sm font-semibold text-slate-900">ถามเรื่องคอร์สนี้</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">เช่น “คอร์สนี้เหมาะกับใคร” หรือ “เริ่มจากบทไหนดี”</p>
+                  </div>
+                  <div className="rounded-[22px] border border-rose-100 bg-white px-4 py-4">
+                    <p className="text-sm font-semibold text-slate-900">ถามเรื่องการซื้อคอร์ส</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">เช่น “วิธี checkout ทำยังไง” หรือ “ติดตามออเดอร์ตรงไหน”</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         <div className="mt-6">

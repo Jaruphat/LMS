@@ -1,7 +1,6 @@
 import Link from "next/link"
-import { ChevronLeft, Eye, FileText, Lock, MessageSquareText, PlayCircle } from "lucide-react"
+import { Bot, ChevronLeft, Eye, FileText, Lock, MessageSquareText, PlayCircle } from "lucide-react"
 import { redirect, notFound } from "next/navigation"
-import { CourseChatbot } from "@/components/chatbot/CourseChatbot"
 import { DiscussionBoard } from "@/components/community/DiscussionBoard"
 import { ViewTracker } from "@/components/engagement/ViewTracker"
 import { LessonViewer } from "@/components/lesson/LessonViewer"
@@ -221,7 +220,29 @@ export default async function LessonPage({
             canPost={discussionAllowed}
             initialThreads={threads}
           />
-          <CourseChatbot courseId={courseId} courseTitle={lesson.course.title} />
+          <section className="rounded-[32px] border border-rose-100 bg-[linear-gradient(180deg,#fffdfc_0%,#fff7f2_100%)] p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+                <Bot className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">Floating Assistant</p>
+                <h2 className="mt-2 text-2xl font-black text-slate-950">ให้ bot ช่วยต่อจากบทที่กำลังเรียนได้</h2>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  ถามต่อจากบริบทของบทเรียนนี้ได้ทันทีจากไอคอนหุ่นยนต์มุมขวาล่าง เช่นให้สรุปบทนี้ แนะนำบทถัดไป หรือช่วยเลือกคอร์สอื่นที่ใกล้กับสิ่งที่กำลังเรียนอยู่
+                </p>
+
+                <div className="mt-5 space-y-3">
+                  <div className="rounded-[22px] border border-rose-100 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                    ตัวอย่างคำถาม: “บทนี้สอนเรื่องอะไร”, “ควรดูบทถัดไปไหน”, “มีคอร์สอื่นที่ต่อยอดจากหัวข้อนี้ไหม”
+                  </div>
+                  <div className="rounded-[22px] border border-rose-100 bg-white px-4 py-4 text-sm leading-6 text-slate-600">
+                    bot สามารถตอบได้ทั้งเรื่องคอร์ส เนื้อหา preview วิธีสั่งซื้อ และการใช้งานระบบโดยไม่ต้องออกจากหน้าเรียน
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         <div className="mt-6 rounded-[32px] border border-rose-100 bg-white p-5 shadow-sm">
